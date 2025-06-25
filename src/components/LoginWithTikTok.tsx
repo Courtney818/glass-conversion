@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, AlertCircle } from 'lucide-react';
+import { ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { User } from '../types/auth';
 
@@ -68,6 +68,14 @@ const LoginWithTikTok: React.FC = () => {
   }, [login]);
 
   const handleTikTokLogin = () => {
+    // Check for dev bypass
+    const isDevBypass = import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV;
+    
+    if (isDevBypass) {
+      handleDevBypass();
+      return;
+    }
+
     const authUrl = new URL('https://www.tiktok.com/auth/authorize/');
     authUrl.searchParams.append('client_key', TIKTOK_CLIENT_ID);
     authUrl.searchParams.append('scope', TIKTOK_SCOPE);
@@ -135,7 +143,8 @@ const LoginWithTikTok: React.FC = () => {
           <button
             onClick={handleTikTokLogin}
             disabled={isLoading}
-            className="group relative w-full flex justify-center py-4 px-6 border border-transparent text-lg font-semibold rounded-lg text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="group relative w-full flex justify-center py-4 px-6 border border-transparent text-lg font-semibold rounded-lg text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg hover:shadow-xl"
+            title={import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV ? "Dev mode active – bypassing TikTok login" : ""}
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
@@ -147,11 +156,19 @@ const LoginWithTikTok: React.FC = () => {
                 <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
                   <div className="w-4 h-4 bg-black rounded-sm"></div>
                 </div>
-                <span>Continue with TikTok</span>
+                <span>Log in with TikTok</span>
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </div>
             )}
           </button>
+
+          {/* Dev Mode Indicator */}
+          {import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV && (
+            <div className="flex items-center justify-center space-x-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+              <Zap size={14} />
+              <span>Dev mode active – bypassing TikTok login</span>
+            </div>
+          )}
 
           <div className="text-center">
             <button
@@ -166,8 +183,8 @@ const LoginWithTikTok: React.FC = () => {
         {/* Privacy Notice */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Privacy-first authentication</p>
-            <p>We only access basic profile info needed for your dashboard. No personal data from your viewers is ever stored.</p>
+            <p className="font-medium mb-1">We'll never message your followers or access private data.</p>
+            <p>TikTok login keeps your account safe and compliant with platform guidelines.</p>
           </div>
         </div>
 

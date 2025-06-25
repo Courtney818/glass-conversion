@@ -1,16 +1,25 @@
 import React from 'react';
-import { TrendingUp, MessageSquare, Clock, ArrowRight } from 'lucide-react';
+import { TrendingUp, MessageSquare, Clock, ArrowRight, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const AnalyticsPreview: React.FC = () => {
   const { authState } = useAuth();
 
-  const handleSignUpClick = () => {
-    if (authState.isAuthenticated) {
+  const handleTikTokLogin = () => {
+    // Check for dev bypass
+    const isDevBypass = import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV;
+    
+    if (isDevBypass) {
       window.location.hash = '#dashboard';
+      window.location.reload();
     } else {
       window.location.hash = '#login';
+      window.location.reload();
     }
+  };
+
+  const handleDashboardClick = () => {
+    window.location.hash = '#dashboard';
     window.location.reload();
   };
 
@@ -52,13 +61,39 @@ const AnalyticsPreview: React.FC = () => {
               </div>
             </div>
 
-            <button 
-              onClick={handleSignUpClick}
-              className="flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold group"
-            >
-              <span>{authState.isAuthenticated ? 'Go to Dashboard' : 'Try it free'}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+            <div className="space-y-4">
+              {authState.isAuthenticated ? (
+                <button 
+                  onClick={handleDashboardClick}
+                  className="flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold group"
+                >
+                  <span>Go to Dashboard</span>
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleTikTokLogin}
+                    className="flex items-center space-x-3 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold group"
+                    title={import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV ? "Dev mode active – bypassing TikTok login" : ""}
+                  >
+                    <div className="w-5 h-5 bg-white rounded-sm flex items-center justify-center">
+                      <div className="w-3 h-3 bg-black rounded-sm"></div>
+                    </div>
+                    <span>Log in with TikTok</span>
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  
+                  {/* Dev Mode Indicator */}
+                  {import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV && (
+                    <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                      <Zap size={14} />
+                      <span>Dev mode active</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Right Column - Analytics Mockup */}

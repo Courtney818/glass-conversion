@@ -111,21 +111,16 @@ const Navigation: React.FC = () => {
                 </button>
               </>
             ) : (
-              <>
-                <button 
-                  onClick={handleLoginClick}
-                  className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  Login
-                </button>
-                <button 
-                  onClick={handleLoginClick}
-                  className="px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors flex items-center space-x-2 group"
-                >
-                  <span>Start free</span>
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </>
+              <button 
+                onClick={handleLoginClick}
+                className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center space-x-2 group font-semibold"
+              >
+                <div className="w-5 h-5 bg-white rounded-sm flex items-center justify-center">
+                  <div className="w-3 h-3 bg-black rounded-sm"></div>
+                </div>
+                <span>Log in with TikTok</span>
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </button>
             )}
           </div>
 
@@ -175,21 +170,16 @@ const Navigation: React.FC = () => {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <button 
-                      onClick={handleLoginClick}
-                      className="w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-                    >
-                      Login
-                    </button>
-                    <button 
-                      onClick={handleLoginClick}
-                      className="w-full px-3 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] flex items-center justify-center space-x-2"
-                    >
-                      <span>Start free</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </>
+                  <button 
+                    onClick={handleLoginClick}
+                    className="w-full px-3 py-3 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center justify-center space-x-2 font-semibold"
+                  >
+                    <div className="w-5 h-5 bg-white rounded-sm flex items-center justify-center">
+                      <div className="w-3 h-3 bg-black rounded-sm"></div>
+                    </div>
+                    <span>Log in with TikTok</span>
+                    <ArrowRight size={16} />
+                  </button>
                 )}
               </div>
             </div>

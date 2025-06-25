@@ -1,21 +1,27 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const Hero: React.FC = () => {
   const { authState } = useAuth();
 
-  const handleGetStartedClick = () => {
-    if (authState.isAuthenticated) {
+  const handleTikTokLogin = () => {
+    // Check for dev bypass
+    const isDevBypass = import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV;
+    
+    if (isDevBypass) {
+      // Show dev mode tooltip and redirect to dashboard
       window.location.hash = '#dashboard';
+      window.location.reload();
     } else {
+      // Redirect to TikTok OAuth
       window.location.hash = '#login';
+      window.location.reload();
     }
-    window.location.reload();
   };
 
-  const handleLoginClick = () => {
-    window.location.hash = '#login';
+  const handleDashboardClick = () => {
+    window.location.hash = '#dashboard';
     window.location.reload();
   };
 
@@ -51,22 +57,43 @@ const Hero: React.FC = () => {
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={handleGetStartedClick}
-              className="px-8 py-4 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold text-lg flex items-center space-x-2 group"
-            >
-              <span>{authState.isAuthenticated ? 'Go to Dashboard' : 'Start free'}</span>
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            {!authState.isAuthenticated && (
+          {/* CTA Button */}
+          <div className="flex flex-col items-center space-y-4">
+            {authState.isAuthenticated ? (
               <button 
-                onClick={handleLoginClick}
-                className="flex items-center space-x-2 px-8 py-4 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                onClick={handleDashboardClick}
+                className="px-8 py-4 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold text-lg flex items-center space-x-2 group"
               >
-                <span>Login</span>
+                <span>Go to Dashboard</span>
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
+            ) : (
+              <>
+                <button 
+                  onClick={handleTikTokLogin}
+                  className="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold text-lg flex items-center space-x-3 group shadow-lg hover:shadow-xl"
+                  title={import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV ? "Dev mode active – bypassing TikTok login" : ""}
+                >
+                  <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
+                    <div className="w-4 h-4 bg-black rounded-sm"></div>
+                  </div>
+                  <span>Log in with TikTok</span>
+                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                
+                {/* Dev Mode Indicator */}
+                {import.meta.env.VITE_DEV_BYPASS === 'true' && import.meta.env.DEV && (
+                  <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                    <Zap size={14} />
+                    <span>Dev mode active – bypassing TikTok login</span>
+                  </div>
+                )}
+                
+                {/* Privacy Message */}
+                <p className="text-sm text-gray-600 max-w-md mx-auto leading-relaxed">
+                  We'll never message your followers or access private data. TikTok login keeps your account safe.
+                </p>
+              </>
             )}
           </div>
 
