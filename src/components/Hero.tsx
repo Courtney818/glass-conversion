@@ -1,9 +1,16 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Hero: React.FC = () => {
-  const handleSignUpClick = () => {
-    window.location.hash = '#signup';
+  const { authState } = useAuth();
+
+  const handleGetStartedClick = () => {
+    if (authState.isAuthenticated) {
+      window.location.hash = '#dashboard';
+    } else {
+      window.location.hash = '#login';
+    }
     window.location.reload();
   };
 
@@ -47,18 +54,20 @@ const Hero: React.FC = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
-              onClick={handleSignUpClick}
+              onClick={handleGetStartedClick}
               className="px-8 py-4 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold text-lg flex items-center space-x-2 group"
             >
-              <span>Start free</span>
+              <span>{authState.isAuthenticated ? 'Go to Dashboard' : 'Start free'}</span>
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <button 
-              onClick={handleLoginClick}
-              className="flex items-center space-x-2 px-8 py-4 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
-            >
-              <span>Login</span>
-            </button>
+            {!authState.isAuthenticated && (
+              <button 
+                onClick={handleLoginClick}
+                className="flex items-center space-x-2 px-8 py-4 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+              >
+                <span>Login</span>
+              </button>
+            )}
           </div>
 
           {/* Demo Preview */}

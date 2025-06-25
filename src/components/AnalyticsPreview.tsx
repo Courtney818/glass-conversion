@@ -1,9 +1,16 @@
 import React from 'react';
 import { TrendingUp, MessageSquare, Clock, ArrowRight } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const AnalyticsPreview: React.FC = () => {
+  const { authState } = useAuth();
+
   const handleSignUpClick = () => {
-    window.location.hash = '#signup';
+    if (authState.isAuthenticated) {
+      window.location.hash = '#dashboard';
+    } else {
+      window.location.hash = '#login';
+    }
     window.location.reload();
   };
 
@@ -49,7 +56,7 @@ const AnalyticsPreview: React.FC = () => {
               onClick={handleSignUpClick}
               className="flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold group"
             >
-              <span>Try it free</span>
+              <span>{authState.isAuthenticated ? 'Go to Dashboard' : 'Try it free'}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

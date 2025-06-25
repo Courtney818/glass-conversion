@@ -1,9 +1,16 @@
 import React from 'react';
 import { Check, ArrowRight } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Pricing: React.FC = () => {
+  const { authState } = useAuth();
+
   const handleSignUpClick = () => {
-    window.location.hash = '#signup';
+    if (authState.isAuthenticated) {
+      window.location.hash = '#dashboard';
+    } else {
+      window.location.hash = '#login';
+    }
     window.location.reload();
   };
 
@@ -115,7 +122,7 @@ const Pricing: React.FC = () => {
             onClick={handleSignUpClick}
             className="px-8 py-4 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold text-lg flex items-center space-x-2 mx-auto group"
           >
-            <span>Start free today</span>
+            <span>{authState.isAuthenticated ? 'Go to Dashboard' : 'Start free today'}</span>
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

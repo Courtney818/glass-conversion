@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Navigation: React.FC = () => {
+  const { authState, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -39,8 +41,8 @@ const Navigation: React.FC = () => {
     window.location.reload();
   };
 
-  const handleSignUpClick = () => {
-    window.location.hash = '#signup';
+  const handleDashboardClick = () => {
+    window.location.hash = '#dashboard';
     window.location.reload();
   };
 
@@ -74,19 +76,57 @@ const Navigation: React.FC = () => {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <button 
-              onClick={handleLoginClick}
-              className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              Login
-            </button>
-            <button 
-              onClick={handleSignUpClick}
-              className="px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors flex items-center space-x-2 group"
-            >
-              <span>Start free</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+            {authState.isAuthenticated ? (
+              <>
+                <div className="flex items-center space-x-3">
+                  {authState.user?.avatarUrl && (
+                    <img 
+                      src={authState.user.avatarUrl} 
+                      alt={authState.user.displayName}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <span className="text-sm text-gray-700">
+                    {authState.user?.displayName}
+                  </span>
+                  {authState.user?.isDev && (
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                      🧪 Dev
+                    </span>
+                  )}
+                </div>
+                <button 
+                  onClick={handleDashboardClick}
+                  className="px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors flex items-center space-x-2 group"
+                >
+                  <span>Dashboard</span>
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button 
+                  onClick={logout}
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut size={20} />
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={handleLoginClick}
+                  className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  Login
+                </button>
+                <button 
+                  onClick={handleLoginClick}
+                  className="px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors flex items-center space-x-2 group"
+                >
+                  <span>Start free</span>
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -110,19 +150,47 @@ const Navigation: React.FC = () => {
                 Pricing
               </a>
               <div className="pt-2 space-y-2">
-                <button 
-                  onClick={handleLoginClick}
-                  className="w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-                >
-                  Login
-                </button>
-                <button 
-                  onClick={handleSignUpClick}
-                  className="w-full px-3 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] flex items-center justify-center space-x-2"
-                >
-                  <span>Start free</span>
-                  <ArrowRight size={16} />
-                </button>
+                {authState.isAuthenticated ? (
+                  <>
+                    <div className="px-3 py-2 text-sm text-gray-600">
+                      Welcome, {authState.user?.displayName}
+                      {authState.user?.isDev && (
+                        <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                          🧪 Dev
+                        </span>
+                      )}
+                    </div>
+                    <button 
+                      onClick={handleDashboardClick}
+                      className="w-full px-3 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] flex items-center justify-center space-x-2"
+                    >
+                      <span>Dashboard</span>
+                      <ArrowRight size={16} />
+                    </button>
+                    <button 
+                      onClick={logout}
+                      className="w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={handleLoginClick}
+                      className="w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
+                    >
+                      Login
+                    </button>
+                    <button 
+                      onClick={handleLoginClick}
+                      className="w-full px-3 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] flex items-center justify-center space-x-2"
+                    >
+                      <span>Start free</span>
+                      <ArrowRight size={16} />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

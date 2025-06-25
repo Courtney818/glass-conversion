@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { BarChart3, TrendingUp, Users, Clock, ArrowRight, Settings, User, Video, BookOpen, Play, ExternalLink } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Clock, ArrowRight, Settings, User, Video, BookOpen, Play, ExternalLink, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Dashboard: React.FC = () => {
+  const { authState, logout } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showSampleStream, setShowSampleStream] = useState(false);
@@ -47,7 +49,12 @@ const Dashboard: React.FC = () => {
                   GlassConversion
                 </span>
                 <div className="hidden sm:flex items-center space-x-2 ml-6">
-                  <span className="text-sm text-gray-600">Welcome, Creator</span>
+                  <span className="text-sm text-gray-600">Welcome, {authState.user?.displayName}</span>
+                  {authState.user?.isDev && (
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                      🧪 Dev Mode
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -60,6 +67,13 @@ const Dashboard: React.FC = () => {
                   className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   Back to Setup
+                </button>
+                <button
+                  onClick={logout}
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut size={20} />
                 </button>
               </div>
             </div>
@@ -173,7 +187,12 @@ const Dashboard: React.FC = () => {
                 GlassConversion
               </span>
               <div className="hidden sm:flex items-center space-x-2 ml-6">
-                <span className="text-sm text-gray-600">Welcome, Creator</span>
+                <span className="text-sm text-gray-600">Welcome, {authState.user?.displayName}</span>
+                {authState.user?.isDev && (
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                    🧪 Dev Mode
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -195,6 +214,13 @@ const Dashboard: React.FC = () => {
                 className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
               >
                 Back to Home
+              </button>
+              <button
+                onClick={logout}
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                title="Logout"
+              >
+                <LogOut size={20} />
               </button>
             </div>
           </div>
@@ -329,15 +355,17 @@ const Dashboard: React.FC = () => {
           )}
 
           {/* Developer Mode - DEV ONLY */}
-          <div className="pt-16 border-t border-gray-200/50">
-            <button
-              onClick={handleDevSkip}
-              className="text-sm text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-4"
-            >
-              Skip TikTok connection (developer access)
-            </button>
-            {/* // DEV ONLY – REMOVE BEFORE PRODUCTION */}
-          </div>
+          {import.meta.env.DEV && (
+            <div className="pt-16 border-t border-gray-200/50">
+              <button
+                onClick={handleDevSkip}
+                className="text-sm text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-4"
+              >
+                Skip TikTok connection (developer access)
+              </button>
+              {/* // DEV ONLY – REMOVE BEFORE PRODUCTION */}
+            </div>
+          )}
         </div>
       </main>
     </div>
