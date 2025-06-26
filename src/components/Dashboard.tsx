@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import TikTokConnectionCard from './TikTokConnectionCard';
 import LiveAnalyticsDashboard from './LiveAnalyticsDashboard';
+import DashboardLayout from './DashboardLayout';
 
 const Dashboard: React.FC = () => {
   const { authState, logout } = useAuth();
@@ -11,6 +12,7 @@ const Dashboard: React.FC = () => {
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showSampleStream, setShowSampleStream] = useState(false);
   const [showLiveAnalytics, setShowLiveAnalytics] = useState(false);
+  const [showDashboardLayout, setShowDashboardLayout] = useState(false);
 
   const handleBackToHome = () => {
     window.location.hash = '';
@@ -25,6 +27,10 @@ const Dashboard: React.FC = () => {
     setShowLiveAnalytics(true);
   };
 
+  const handleViewDashboard = () => {
+    setShowDashboardLayout(true);
+  };
+
   const handleReadGuide = () => {
     window.location.hash = '#help';
     window.location.reload();
@@ -35,6 +41,11 @@ const Dashboard: React.FC = () => {
     // Skip to live dashboard state
     setShowSampleStream(true);
   };
+
+  // Show Dashboard Layout
+  if (showDashboardLayout) {
+    return <DashboardLayout />;
+  }
 
   // Show Live Analytics Dashboard
   if (showLiveAnalytics) {
@@ -348,6 +359,15 @@ const Dashboard: React.FC = () => {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
+                  onClick={handleViewDashboard}
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors shadow-sm group font-semibold"
+                >
+                  <BarChart3 size={18} />
+                  <span>Full Dashboard</span>
+                  <ExternalLink size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
+                
+                <button
                   onClick={handleViewSample}
                   className="inline-flex items-center space-x-2 px-6 py-3 bg-white/70 backdrop-blur-sm text-gray-700 rounded-lg hover:bg-white/90 transition-colors border border-white/20 shadow-sm group"
                 >
@@ -358,7 +378,7 @@ const Dashboard: React.FC = () => {
                 
                 <button
                   onClick={handleViewLiveAnalytics}
-                  className="inline-flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors shadow-sm group"
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-white/70 backdrop-blur-sm text-gray-700 rounded-lg hover:bg-white/90 transition-colors border border-white/20 shadow-sm group"
                 >
                   <Activity size={18} />
                   <span>Live Analytics Demo</span>
