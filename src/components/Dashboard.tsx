@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { BarChart3, TrendingUp, Users, Clock, ArrowRight, Settings, User, Video, BookOpen, Play, ExternalLink, LogOut } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Clock, ArrowRight, Settings, User, Video, BookOpen, Play, ExternalLink, LogOut, Activity } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import TikTokConnectionCard from './TikTokConnectionCard';
+import LiveAnalyticsDashboard from './LiveAnalyticsDashboard';
 
 const Dashboard: React.FC = () => {
   const { authState, logout } = useAuth();
   const { connectionState } = useTikTokConnection();
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showSampleStream, setShowSampleStream] = useState(false);
+  const [showLiveAnalytics, setShowLiveAnalytics] = useState(false);
 
   const handleBackToHome = () => {
     window.location.hash = '';
@@ -17,6 +19,10 @@ const Dashboard: React.FC = () => {
 
   const handleViewSample = () => {
     setShowSampleStream(true);
+  };
+
+  const handleViewLiveAnalytics = () => {
+    setShowLiveAnalytics(true);
   };
 
   const handleReadGuide = () => {
@@ -29,6 +35,11 @@ const Dashboard: React.FC = () => {
     // Skip to live dashboard state
     setShowSampleStream(true);
   };
+
+  // Show Live Analytics Dashboard
+  if (showLiveAnalytics) {
+    return <LiveAnalyticsDashboard />;
+  }
 
   if (showSampleStream) {
     return (
@@ -135,7 +146,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Sample Timeline */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 shadow-sm border border-white/20">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 shadow-sm border border-white/20 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 font-space-grotesk mb-6">
               Buying Signal Timeline
             </h2>
@@ -163,6 +174,27 @@ const Dashboard: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* CTA to Live Analytics */}
+          <div className="bg-gradient-to-r from-[#FF3B5C] to-[#FF6B8A] rounded-2xl p-8 text-white text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Activity size={32} className="text-white" />
+            </div>
+            <h3 className="text-2xl font-bold mb-4 font-space-grotesk">
+              Ready for Live Analytics?
+            </h3>
+            <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
+              Experience our real-time analytics dashboard with live buyer intent tracking, keyword radar, and AI-powered sales prompts.
+            </p>
+            <button
+              onClick={handleViewLiveAnalytics}
+              className="px-8 py-4 bg-white text-[#FF3B5C] rounded-xl hover:bg-gray-50 transition-colors font-semibold text-lg flex items-center space-x-3 mx-auto group shadow-lg hover:shadow-xl"
+            >
+              <Activity size={24} />
+              <span>View Live Analytics Dashboard</span>
+              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         </main>
       </div>
@@ -321,6 +353,15 @@ const Dashboard: React.FC = () => {
                 >
                   <Play size={18} />
                   <span>View Sample Stream</span>
+                  <ExternalLink size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
+                
+                <button
+                  onClick={handleViewLiveAnalytics}
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors shadow-sm group"
+                >
+                  <Activity size={18} />
+                  <span>Live Analytics Demo</span>
                   <ExternalLink size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </button>
                 
