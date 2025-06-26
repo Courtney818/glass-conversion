@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Video, ArrowRight, AlertCircle, CheckCircle, Loader2, Zap, X, Edit3, ExternalLink, Check } from 'lucide-react';
+import { Video, ArrowRight, AlertCircle, CheckCircle, Loader2, Zap, X, Edit3, ExternalLink, Check, Shield } from 'lucide-react';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 
 const TikTokConnectionCard: React.FC = () => {
@@ -8,6 +8,7 @@ const TikTokConnectionCard: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [validationSuccess, setValidationSuccess] = useState(false);
 
   // Initialize dev handle from current connection
   useEffect(() => {
@@ -26,6 +27,7 @@ const TikTokConnectionCard: React.FC = () => {
     try {
       setIsValidating(true);
       setValidationError(null);
+      setValidationSuccess(false);
       
       // Clean handle (remove @ if present)
       const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
@@ -48,6 +50,10 @@ const TikTokConnectionCard: React.FC = () => {
       // For dev mode, we'll simulate this check
       const isValid = true; // Assume valid for dev mode
       
+      if (isValid) {
+        setValidationSuccess(true);
+      }
+      
       return isValid;
     } catch (error) {
       console.warn('TikTok validation failed:', error);
@@ -56,6 +62,10 @@ const TikTokConnectionCard: React.FC = () => {
     } finally {
       setIsValidating(false);
     }
+  };
+
+  const handleExplicitValidation = async () => {
+    await validateTikTokHandle(devHandle);
   };
 
   const handleDevConnect = async (e: React.FormEvent) => {
@@ -67,15 +77,19 @@ const TikTokConnectionCard: React.FC = () => {
     
     await connectDevHandle(devHandle);
     setIsEditing(false);
+    setValidationSuccess(false);
   };
 
   const handleDevUpdate = async () => {
-    // Validate handle first
-    const isValid = await validateTikTokHandle(devHandle);
-    if (!isValid) return;
+    // Validate handle first if not already validated
+    if (!validationSuccess) {
+      const isValid = await validateTikTokHandle(devHandle);
+      if (!isValid) return;
+    }
     
     await connectDevHandle(devHandle);
     setIsEditing(false);
+    setValidationSuccess(false);
   };
 
   const handleRealConnect = async () => {
@@ -87,16 +101,19 @@ const TikTokConnectionCard: React.FC = () => {
     setDevHandle('');
     setIsEditing(false);
     setValidationError(null);
+    setValidationSuccess(false);
   };
 
   const startEditing = () => {
     setIsEditing(true);
     setValidationError(null);
+    setValidationSuccess(false);
   };
 
   const cancelEditing = () => {
     setIsEditing(false);
     setValidationError(null);
+    setValidationSuccess(false);
     // Reset to current handle
     if (connectionState.tiktokHandle) {
       const handle = connectionState.tiktokHandle.startsWith('@') 
@@ -161,6 +178,7 @@ const TikTokConnectionCard: React.FC = () => {
                     onChange={(e) => {
                       setDevHandle(e.target.value);
                       setValidationError(null);
+                      setValidationSuccess(false);
                     }}
                     placeholder="username"
                     className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF3B5C] focus:border-transparent transition-colors"
@@ -173,11 +191,18 @@ const TikTokConnectionCard: React.FC = () => {
                   )}
                 </div>
                 
-                {/* Validation Error */}
+                {/* Validation Messages */}
                 {validationError && (
                   <div className="mt-2 flex items-center space-x-2 text-red-600">
                     <AlertCircle size={14} />
                     <span className="text-sm">{validationError}</span>
+                  </div>
+                )}
+                
+                {validationSuccess && (
+                  <div className="mt-2 flex items-center space-x-2 text-green-600">
+                    <CheckCircle size={14} />
+                    <span className="text-sm">Valid username format!</span>
                   </div>
                 )}
                 
@@ -197,16 +222,41 @@ const TikTokConnectionCard: React.FC = () => {
                 )}
               </div>
               
+              {/* Action Buttons */}
               <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={handleExplicitValidation}
+                  disabled={isValidating || !devHandle.trim() || validationSuccess}
+                  className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {isValidating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Validating...</span>
+                    </>
+                  ) : validationSuccess ? (
+                    <>
+                      <CheckCircle size={16} />
+                      <span>Validated</span>
+                    </>
+                  ) : (
+                    <>
+                      <Shield size={16} />
+                      <span>Validate</span>
+                    </>
+                  )}
+                </button>
+                
                 <button
                   type="submit"
                   disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
                   className="flex-1 px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
-                  {connectionState.isLoading || isValidating ? (
+                  {connectionState.isLoading ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      <span>{isValidating ? 'Validating...' : 'Updating...'}</span>
+                      <span>Updating...</span>
                     </>
                   ) : (
                     <>
@@ -354,6 +404,7 @@ const TikTokConnectionCard: React.FC = () => {
                 onChange={(e) => {
                   setDevHandle(e.target.value);
                   setValidationError(null);
+                  setValidationSuccess(false);
                 }}
                 placeholder="glass_seller_live"
                 className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF3B5C] focus:border-transparent transition-colors"
@@ -366,11 +417,18 @@ const TikTokConnectionCard: React.FC = () => {
               )}
             </div>
             
-            {/* Validation Error */}
+            {/* Validation Messages */}
             {validationError && (
               <div className="mt-2 flex items-center space-x-2 text-red-600">
                 <AlertCircle size={14} />
                 <span className="text-sm">{validationError}</span>
+              </div>
+            )}
+            
+            {validationSuccess && (
+              <div className="mt-2 flex items-center space-x-2 text-green-600">
+                <CheckCircle size={14} />
+                <span className="text-sm">Valid username format!</span>
               </div>
             )}
             
@@ -390,23 +448,50 @@ const TikTokConnectionCard: React.FC = () => {
             )}
           </div>
           
-          <button
-            type="submit"
-            disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
-            className="w-full px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-          >
-            {connectionState.isLoading || isValidating ? (
-              <>
-                <Loader2 size={20} className="animate-spin" />
-                <span>{isValidating ? 'Validating...' : 'Connecting...'}</span>
-              </>
-            ) : (
-              <>
-                <span>Connect This Handle</span>
-                <ArrowRight size={20} />
-              </>
-            )}
-          </button>
+          {/* Action Buttons */}
+          <div className="flex space-x-3">
+            <button
+              type="button"
+              onClick={handleExplicitValidation}
+              disabled={isValidating || !devHandle.trim() || validationSuccess}
+              className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {isValidating ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Validating...</span>
+                </>
+              ) : validationSuccess ? (
+                <>
+                  <CheckCircle size={16} />
+                  <span>Validated</span>
+                </>
+              ) : (
+                <>
+                  <Shield size={16} />
+                  <span>Validate</span>
+                </>
+              )}
+            </button>
+            
+            <button
+              type="submit"
+              disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
+              className="flex-1 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {connectionState.isLoading ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  <span>Connecting...</span>
+                </>
+              ) : (
+                <>
+                  <span>Connect This Handle</span>
+                  <ArrowRight size={20} />
+                </>
+              )}
+            </button>
+          </div>
         </form>
       ) : (
         /* Production Mode: TikTok OAuth Button */
