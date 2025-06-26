@@ -19,8 +19,7 @@ import {
   Hash,
   Mic,
   Play,
-  Pause,
-  Volume2
+  Pause
 } from 'lucide-react';
 
 interface BuyerSignal {
@@ -127,30 +126,6 @@ const LiveAnalyticsDashboard: React.FC = () => {
     { word: 'discount', count: 8, trend: 'down' }
   ]);
 
-  const [suggestedPrompts] = useState([
-    {
-      id: '1',
-      trigger: 'High shipping interest',
-      prompt: "Say this: 'Free shipping on orders over $50! Comment SHIP for details'",
-      urgency: 'high',
-      used: false
-    },
-    {
-      id: '2',
-      trigger: 'Size questions trending',
-      prompt: "Say this: 'Size chart in my bio! Comment SIZE + your measurements'",
-      urgency: 'medium',
-      used: true
-    },
-    {
-      id: '3',
-      trigger: 'Price sensitivity detected',
-      prompt: "Say this: 'Limited time: 20% off for live viewers! Comment LIVE20'",
-      urgency: 'high',
-      used: false
-    }
-  ]);
-
   // Simulate real-time updates
   useEffect(() => {
     if (!isLive) return;
@@ -206,10 +181,6 @@ const LiveAnalyticsDashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, [isLive, streamMetrics.currentViewers]);
 
-  const copyPrompt = (prompt: string) => {
-    navigator.clipboard.writeText(prompt);
-  };
-
   const getIntensityColor = (intensity: string) => {
     switch (intensity) {
       case 'high': return 'bg-red-50 text-red-800 border-red-200';
@@ -262,260 +233,182 @@ const LiveAnalyticsDashboard: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-12 gap-6">
+        {/* Full Width Content Area */}
+        <div className="space-y-6">
           
-          {/* Main Content Area */}
-          <div className="col-span-12 lg:col-span-8 space-y-6">
+          {/* Stream Scorecard */}
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 font-space-grotesk">Stream Scorecard</h2>
+                <p className="text-sm text-gray-600">Real-time performance metrics</p>
+              </div>
+              <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded hover:bg-gray-50">
+                <RefreshCw size={18} />
+              </button>
+            </div>
             
-            {/* Stream Scorecard */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900 font-space-grotesk">Stream Scorecard</h2>
-                  <p className="text-sm text-gray-600">Real-time performance metrics</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <MessageSquare size={20} className="text-blue-600" />
                 </div>
-                <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded hover:bg-gray-50">
-                  <RefreshCw size={18} />
-                </button>
+                <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.totalComments.toLocaleString()}</div>
+                <div className="text-xs text-gray-600">Total Comments</div>
               </div>
               
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <MessageSquare size={20} className="text-blue-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.totalComments.toLocaleString()}</div>
-                  <div className="text-xs text-gray-600">Total Comments</div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Target size={20} className="text-green-600" />
                 </div>
-                
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Target size={20} className="text-green-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.intentPercentage}%</div>
-                  <div className="text-xs text-gray-600">Intent Rate</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <AlertCircle size={20} className="text-red-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.missedMoments}</div>
-                  <div className="text-xs text-gray-600">Missed Moments</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Mic size={20} className="text-purple-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.promptUsage}%</div>
-                  <div className="text-xs text-gray-600">Prompt Usage</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Live Intent Pulse Graph */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <Activity size={20} className="text-red-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Live Intent Pulse</h3>
-                    <p className="text-sm text-gray-600">Real-time buyer interest spikes</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2 bg-red-50 px-3 py-1 rounded-lg border border-red-200">
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-medium text-red-800">HOT Zone</span>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-lg border border-gray-200">
-                    <Users size={14} className="text-gray-500" />
-                    <span className="text-sm font-medium text-gray-900">{streamMetrics.currentViewers}</span>
-                  </div>
-                </div>
+                <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.intentPercentage}%</div>
+                <div className="text-xs text-gray-600">Intent Rate</div>
               </div>
               
-              <div className="relative h-32 mb-4 bg-gray-50 rounded-lg p-3">
-                <div className="absolute inset-3 flex items-end justify-between space-x-1">
-                  {intentPulseData.map((point, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className={`w-full rounded-t transition-all duration-500 ${
-                          point.isHot 
-                            ? 'bg-gradient-to-t from-red-500 to-red-400 shadow-sm' 
-                            : 'bg-gradient-to-t from-blue-400 to-blue-300'
-                        }`}
-                        style={{ height: `${point.intensity}%` }}
-                      >
-                        {point.isHot && (
-                          <div className="w-full h-full flex items-start justify-center pt-1">
-                            <Flame size={10} className="text-white animate-pulse" />
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-xs text-gray-500 mt-2">{point.timestamp}</span>
-                    </div>
-                  ))}
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <AlertCircle size={20} className="text-red-600" />
                 </div>
+                <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.missedMoments}</div>
+                <div className="text-xs text-gray-600">Missed Moments</div>
               </div>
               
-              <div className="flex items-center justify-between text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded">
-                <span>Low Interest</span>
-                <span>High Interest</span>
-              </div>
-            </div>
-
-            {/* Buyer Signal Cards */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Zap size={20} className="text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Buyer Signals</h3>
-                    <p className="text-sm text-gray-600">High-intent moments detected</p>
-                  </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Mic size={20} className="text-purple-600" />
                 </div>
-                <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                  Last updated: {new Date().toLocaleTimeString()}
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                {buyerSignals.map((signal) => (
-                  <div key={signal.id} className="bg-gray-50 rounded-lg p-4 border border-gray-100 hover:shadow-sm transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center space-x-3">
-                          <span className="font-mono text-xs font-medium text-gray-700 bg-white px-2 py-1 rounded border">
-                            {signal.timestamp}
-                          </span>
-                          <span className={`px-2 py-1 rounded text-xs font-medium border ${getIntensityColor(signal.intensity)}`}>
-                            {signal.intensity.toUpperCase()}
-                          </span>
-                          <div className="flex items-center space-x-1 text-gray-500">
-                            <Eye size={12} />
-                            <span className="text-xs">{signal.viewerCount}</span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-800 font-medium">{signal.summary}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {signal.keywords.map((keyword, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium border border-blue-200">
-                              #{keyword}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded hover:bg-gray-100">
-                        <ArrowUp size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Keyword Radar */}
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Hash size={20} className="text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Keyword Radar</h3>
-                  <p className="text-sm text-gray-600">Trending product keywords</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-3">
-                {trendingKeywords.map((keyword, index) => (
-                  <div key={index} className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
-                    <span className="font-medium text-gray-800">#{keyword.word}</span>
-                    <span className="text-sm text-gray-600">({keyword.count})</span>
-                    {getTrendIcon(keyword.trend)}
-                  </div>
-                ))}
+                <div className="text-2xl font-semibold text-gray-900 mb-1">{streamMetrics.promptUsage}%</div>
+                <div className="text-xs text-gray-600">Prompt Usage</div>
               </div>
             </div>
           </div>
 
-          {/* Sales Prompt Panel */}
-          <div className="col-span-12 lg:col-span-4">
-            <div className="sticky top-6 bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center space-x-3 mb-6">
+          {/* Live Intent Pulse Graph */}
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                  <Volume2 size={20} className="text-red-600" />
+                  <Activity size={20} className="text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Sales Prompts</h3>
-                  <p className="text-sm text-gray-600">AI-suggested call-to-actions</p>
+                  <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Live Intent Pulse</h3>
+                  <p className="text-sm text-gray-600">Real-time buyer interest spikes</p>
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                {suggestedPrompts.map((prompt) => (
-                  <div key={prompt.id} className={`p-4 rounded-lg border-2 transition-all ${
-                    prompt.urgency === 'high' 
-                      ? 'border-red-200 bg-red-50' 
-                      : 'border-yellow-200 bg-yellow-50'
-                  } ${prompt.used ? 'opacity-60' : 'hover:shadow-sm'}`}>
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          prompt.urgency === 'high' 
-                            ? 'bg-red-100 text-red-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {prompt.urgency.toUpperCase()}
-                        </span>
-                        {prompt.used && (
-                          <CheckCircle size={14} className="text-green-600" />
-                        )}
-                      </div>
-                      <button 
-                        onClick={() => copyPrompt(prompt.prompt)}
-                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors rounded hover:bg-white"
-                        disabled={prompt.used}
-                      >
-                        <Copy size={12} />
-                      </button>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 bg-red-50 px-3 py-1 rounded-lg border border-red-200">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-red-800">HOT Zone</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-lg border border-gray-200">
+                  <Users size={14} className="text-gray-500" />
+                  <span className="text-sm font-medium text-gray-900">{streamMetrics.currentViewers}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative h-32 mb-4 bg-gray-50 rounded-lg p-3">
+              <div className="absolute inset-3 flex items-end justify-between space-x-1">
+                {intentPulseData.map((point, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center">
+                    <div 
+                      className={`w-full rounded-t transition-all duration-500 ${
+                        point.isHot 
+                          ? 'bg-gradient-to-t from-red-500 to-red-400 shadow-sm' 
+                          : 'bg-gradient-to-t from-blue-400 to-blue-300'
+                      }`}
+                      style={{ height: `${point.intensity}%` }}
+                    >
+                      {point.isHot && (
+                        <div className="w-full h-full flex items-start justify-center pt-1">
+                          <Flame size={10} className="text-white animate-pulse" />
+                        </div>
+                      )}
                     </div>
-                    
-                    <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">
-                      {prompt.trigger}
-                    </div>
-                    
-                    <div className="text-sm text-gray-800 font-medium leading-relaxed mb-3 bg-white p-3 rounded border">
-                      {prompt.prompt}
-                    </div>
-                    
-                    {!prompt.used && (
-                      <button className={`w-full px-3 py-2 rounded font-medium transition-colors text-sm ${
-                        prompt.urgency === 'high'
-                          ? 'bg-red-600 text-white hover:bg-red-700'
-                          : 'bg-yellow-600 text-white hover:bg-yellow-700'
-                      }`}>
-                        Use This Prompt
-                      </button>
-                    )}
+                    <span className="text-xs text-gray-500 mt-2">{point.timestamp}</span>
                   </div>
                 ))}
               </div>
-              
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <TrendingUp size={14} className="text-blue-600" />
-                  <span className="text-sm font-medium text-blue-900">Performance Tip</span>
+            </div>
+            
+            <div className="flex items-center justify-between text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded">
+              <span>Low Interest</span>
+              <span>High Interest</span>
+            </div>
+          </div>
+
+          {/* Buyer Signal Cards */}
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Zap size={20} className="text-green-600" />
                 </div>
-                <p className="text-sm text-blue-800">
-                  Your intent rate is {streamMetrics.intentPercentage}%. Try using more specific product prompts to boost engagement!
-                </p>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Buyer Signals</h3>
+                  <p className="text-sm text-gray-600">High-intent moments detected</p>
+                </div>
               </div>
+              <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                Last updated: {new Date().toLocaleTimeString()}
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              {buyerSignals.map((signal) => (
+                <div key={signal.id} className="bg-gray-50 rounded-lg p-4 border border-gray-100 hover:shadow-sm transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <span className="font-mono text-xs font-medium text-gray-700 bg-white px-2 py-1 rounded border">
+                          {signal.timestamp}
+                        </span>
+                        <span className={`px-2 py-1 rounded text-xs font-medium border ${getIntensityColor(signal.intensity)}`}>
+                          {signal.intensity.toUpperCase()}
+                        </span>
+                        <div className="flex items-center space-x-1 text-gray-500">
+                          <Eye size={12} />
+                          <span className="text-xs">{signal.viewerCount}</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-800 font-medium">{signal.summary}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {signal.keywords.map((keyword, index) => (
+                          <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium border border-blue-200">
+                            #{keyword}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded hover:bg-gray-100">
+                      <ArrowUp size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Keyword Radar */}
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Hash size={20} className="text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">Keyword Radar</h3>
+                <p className="text-sm text-gray-600">Trending product keywords</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              {trendingKeywords.map((keyword, index) => (
+                <div key={index} className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
+                  <span className="font-medium text-gray-800">#{keyword.word}</span>
+                  <span className="text-sm text-gray-600">({keyword.count})</span>
+                  {getTrendIcon(keyword.trend)}
+                </div>
+              ))}
             </div>
           </div>
         </div>
