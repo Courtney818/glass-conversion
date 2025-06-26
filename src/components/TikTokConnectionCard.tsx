@@ -3,26 +3,26 @@ import { Video, ArrowRight, AlertCircle, CheckCircle, Loader2, Zap, X, Edit3, Ex
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 
 const TikTokConnectionCard: React.FC = () => {
-  const { connectionState, connectDevHandle, connectRealTikTok, disconnect, isDevMode } = useTikTokConnection();
-  const [devHandle, setDevHandle] = useState('');
+  const { connectionState, updateTikTokHandle, connectRealTikTok, disconnect, isDevMode } = useTikTokConnection();
+  const [handle, setHandle] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [validationSuccess, setValidationSuccess] = useState(false);
 
-  // Initialize dev handle from current connection
+  // Initialize handle from current connection
   useEffect(() => {
     if (connectionState.isConnected && connectionState.tiktokHandle) {
       // Remove @ symbol for editing
-      const handle = connectionState.tiktokHandle.startsWith('@') 
+      const currentHandle = connectionState.tiktokHandle.startsWith('@') 
         ? connectionState.tiktokHandle.slice(1) 
         : connectionState.tiktokHandle;
-      setDevHandle(handle);
+      setHandle(currentHandle);
     }
   }, [connectionState.isConnected, connectionState.tiktokHandle]);
 
-  const validateTikTokHandle = async (handle: string): Promise<boolean> => {
-    if (!handle.trim()) return false;
+  const validateTikTokHandle = async (handleToValidate: string): Promise<boolean> => {
+    if (!handleToValidate.trim()) return false;
     
     try {
       setIsValidating(true);
@@ -30,7 +30,7 @@ const TikTokConnectionCard: React.FC = () => {
       setValidationSuccess(false);
       
       // Clean handle (remove @ if present)
-      const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
+      const cleanHandle = handleToValidate.startsWith('@') ? handleToValidate.slice(1) : handleToValidate;
       
       // Basic format validation
       if (cleanHandle.length < 2) {
@@ -47,8 +47,8 @@ const TikTokConnectionCard: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 800));
       
       // In a real implementation, you would ping the TikTok profile
-      // For dev mode, we'll simulate this check
-      const isValid = true; // Assume valid for dev mode
+      // For now, we'll simulate this check
+      const isValid = true; // Assume valid for demo purposes
       
       if (isValid) {
         setValidationSuccess(true);
@@ -65,29 +65,29 @@ const TikTokConnectionCard: React.FC = () => {
   };
 
   const handleExplicitValidation = async () => {
-    await validateTikTokHandle(devHandle);
+    await validateTikTokHandle(handle);
   };
 
-  const handleDevConnect = async (e: React.FormEvent) => {
+  const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate handle first
-    const isValid = await validateTikTokHandle(devHandle);
+    const isValid = await validateTikTokHandle(handle);
     if (!isValid) return;
     
-    await connectDevHandle(devHandle);
+    await updateTikTokHandle(handle);
     setIsEditing(false);
     setValidationSuccess(false);
   };
 
-  const handleDevUpdate = async () => {
+  const handleUpdate = async () => {
     // Validate handle first if not already validated
     if (!validationSuccess) {
-      const isValid = await validateTikTokHandle(devHandle);
+      const isValid = await validateTikTokHandle(handle);
       if (!isValid) return;
     }
     
-    await connectDevHandle(devHandle);
+    await updateTikTokHandle(handle);
     setIsEditing(false);
     setValidationSuccess(false);
   };
@@ -98,7 +98,7 @@ const TikTokConnectionCard: React.FC = () => {
 
   const handleDisconnect = () => {
     disconnect();
-    setDevHandle('');
+    setHandle('');
     setIsEditing(false);
     setValidationError(null);
     setValidationSuccess(false);
@@ -116,26 +116,28 @@ const TikTokConnectionCard: React.FC = () => {
     setValidationSuccess(false);
     // Reset to current handle
     if (connectionState.tiktokHandle) {
-      const handle = connectionState.tiktokHandle.startsWith('@') 
+      const currentHandle = connectionState.tiktokHandle.startsWith('@') 
         ? connectionState.tiktokHandle.slice(1) 
         : connectionState.tiktokHandle;
-      setDevHandle(handle);
+      setHandle(currentHandle);
     }
   };
 
-  // Dev Mode - Connected State with Edit Capability
-  if (connectionState.isConnected && isDevMode) {
+  // Connected State with Edit Capability
+  if (connectionState.isConnected) {
     return (
       <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
         {/* Dev Mode Banner */}
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Zap size={16} className="text-yellow-600" />
-            <span className="text-sm font-medium text-yellow-800">
-              🧪 Dev Mode Active
-            </span>
+        {isDevMode && (
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <Zap size={16} className="text-yellow-600" />
+              <span className="text-sm font-medium text-yellow-800">
+                🧪 Dev Mode Active
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -149,7 +151,7 @@ const TikTokConnectionCard: React.FC = () => {
                 </h3>
                 {!isEditing ? (
                   <p className="text-gray-600">
-                    Mock TikTok session active
+                    {isDevMode ? 'Mock TikTok session active' : 'TikTok account connected'}
                   </p>
                 ) : (
                   <p className="text-gray-600">
@@ -162,7 +164,7 @@ const TikTokConnectionCard: React.FC = () => {
 
           {/* Edit Form */}
           {isEditing ? (
-            <form onSubmit={(e) => { e.preventDefault(); handleDevUpdate(); }} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleUpdate(); }} className="space-y-4">
               <div>
                 <label htmlFor="editHandle" className="block text-sm font-medium text-gray-700 mb-2">
                   TikTok Username
@@ -174,9 +176,9 @@ const TikTokConnectionCard: React.FC = () => {
                   <input
                     id="editHandle"
                     type="text"
-                    value={devHandle}
+                    value={handle}
                     onChange={(e) => {
-                      setDevHandle(e.target.value);
+                      setHandle(e.target.value);
                       setValidationError(null);
                       setValidationSuccess(false);
                     }}
@@ -207,16 +209,16 @@ const TikTokConnectionCard: React.FC = () => {
                 )}
                 
                 {/* Validation Link */}
-                {devHandle && (
+                {handle && (
                   <div className="mt-2 flex items-center space-x-2">
                     <ExternalLink size={14} className="text-gray-400" />
                     <a 
-                      href={`https://www.tiktok.com/@${devHandle}`}
+                      href={`https://www.tiktok.com/@${handle}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                     >
-                      Check if @{devHandle} exists on TikTok
+                      Check if @{handle} exists on TikTok
                     </a>
                   </div>
                 )}
@@ -227,7 +229,7 @@ const TikTokConnectionCard: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleExplicitValidation}
-                  disabled={isValidating || !devHandle.trim() || validationSuccess}
+                  disabled={isValidating || !handle.trim() || validationSuccess}
                   className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   {isValidating ? (
@@ -250,7 +252,7 @@ const TikTokConnectionCard: React.FC = () => {
                 
                 <button
                   type="submit"
-                  disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
+                  disabled={connectionState.isLoading || isValidating || !handle.trim()}
                   className="flex-1 px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   {connectionState.isLoading ? (
@@ -307,38 +309,13 @@ const TikTokConnectionCard: React.FC = () => {
           )}
 
           {/* Dev Notice */}
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">
-              This is a mock session for development only. No real TikTok data is linked.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Production Mode - Connected State
-  if (connectionState.isConnected && !isDevMode) {
-    return (
-      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <CheckCircle size={24} className="text-green-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">
-              TikTok Connected
-            </h3>
-            <p className="text-gray-600">
-              ✅ Connected to <span className="font-medium">{connectionState.tiktokHandle}</span>
-            </p>
-          </div>
-        </div>
-        
-        <div className="p-3 bg-green-50 rounded-lg">
-          <p className="text-sm text-green-800">
-            🎉 You're ready to go live! Start your next TikTok Live stream and we'll analyze comments in real-time.
-          </p>
+          {isDevMode && (
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                This is a mock session for development only. No real TikTok data is linked.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -388,9 +365,9 @@ const TikTokConnectionCard: React.FC = () => {
 
       {isDevMode ? (
         /* Dev Mode: Input Field */
-        <form onSubmit={handleDevConnect} className="space-y-4">
+        <form onSubmit={handleConnect} className="space-y-4">
           <div>
-            <label htmlFor="devHandle" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="handle" className="block text-sm font-medium text-gray-700 mb-2">
               Enter test TikTok username
             </label>
             <div className="relative">
@@ -398,11 +375,11 @@ const TikTokConnectionCard: React.FC = () => {
                 <span className="text-gray-500 text-sm">@</span>
               </div>
               <input
-                id="devHandle"
+                id="handle"
                 type="text"
-                value={devHandle}
+                value={handle}
                 onChange={(e) => {
-                  setDevHandle(e.target.value);
+                  setHandle(e.target.value);
                   setValidationError(null);
                   setValidationSuccess(false);
                 }}
@@ -433,16 +410,16 @@ const TikTokConnectionCard: React.FC = () => {
             )}
             
             {/* Validation Link */}
-            {devHandle && (
+            {handle && (
               <div className="mt-2 flex items-center space-x-2">
                 <ExternalLink size={14} className="text-gray-400" />
                 <a 
-                  href={`https://www.tiktok.com/@${devHandle}`}
+                  href={`https://www.tiktok.com/@${handle}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  Check if @{devHandle} exists on TikTok
+                  Check if @{handle} exists on TikTok
                 </a>
               </div>
             )}
@@ -453,7 +430,7 @@ const TikTokConnectionCard: React.FC = () => {
             <button
               type="button"
               onClick={handleExplicitValidation}
-              disabled={isValidating || !devHandle.trim() || validationSuccess}
+              disabled={isValidating || !handle.trim() || validationSuccess}
               className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {isValidating ? (
@@ -476,7 +453,7 @@ const TikTokConnectionCard: React.FC = () => {
             
             <button
               type="submit"
-              disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
+              disabled={connectionState.isLoading || isValidating || !handle.trim()}
               className="flex-1 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {connectionState.isLoading ? (
