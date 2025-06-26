@@ -213,10 +213,10 @@ const LiveAnalyticsDashboard: React.FC = () => {
 
   const getIntensityColor = (intensity: string) => {
     switch (intensity) {
-      case 'high': return 'bg-red-50 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-50 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-gray-50 text-gray-800 border-gray-200';
-      default: return 'bg-gray-50 text-gray-800 border-gray-200';
+      case 'high': return 'bg-red-50/80 text-red-800 border-red-200/60';
+      case 'medium': return 'bg-yellow-50/80 text-yellow-800 border-yellow-200/60';
+      case 'low': return 'bg-gray-50/80 text-gray-800 border-gray-200/60';
+      default: return 'bg-gray-50/80 text-gray-800 border-gray-200/60';
     }
   };
 
@@ -229,191 +229,192 @@ const LiveAnalyticsDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-purple-50/30">
       {/* Status Banner */}
-      <div className={`w-full px-8 py-4 ${isLive ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-gray-500 to-gray-600'} text-white shadow-lg`}>
+      <div className={`w-full px-8 py-5 ${isLive ? 'bg-gradient-to-r from-red-500/95 via-red-600/95 to-pink-600/95' : 'bg-gradient-to-r from-gray-500/95 via-gray-600/95 to-slate-600/95'} backdrop-blur-xl text-white shadow-2xl border-b border-white/20`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-4">
               {isLive ? (
                 <>
-                  <div className="w-4 h-4 bg-white rounded-full animate-pulse shadow-lg"></div>
-                  <span className="font-bold text-lg">LIVE</span>
+                  <div className="w-5 h-5 bg-white/90 rounded-full animate-pulse shadow-lg shadow-white/50"></div>
+                  <span className="font-bold text-xl tracking-wide">LIVE</span>
                 </>
               ) : (
                 <>
-                  <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-                  <span className="font-bold text-lg">OFFLINE</span>
+                  <div className="w-5 h-5 bg-white/60 rounded-full"></div>
+                  <span className="font-bold text-xl tracking-wide">OFFLINE</span>
                 </>
               )}
             </div>
-            <span className="text-white/90 font-medium">Ready to Stream — Monitoring @glass_seller_live</span>
+            <div className="h-6 w-px bg-white/30"></div>
+            <span className="text-white/90 font-medium text-lg">Ready to Stream — Monitoring @glass_seller_live</span>
           </div>
-          <div className="flex items-center space-x-6">
-            <span className="text-sm text-white/80 font-medium">{streamMetrics.streamDuration}</span>
+          <div className="flex items-center space-x-8">
+            <span className="text-sm text-white/80 font-semibold bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">{streamMetrics.streamDuration}</span>
             <button
               onClick={() => setIsLive(!isLive)}
-              className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl hover:bg-white/30 transition-all duration-300 flex items-center space-x-2 font-medium"
+              className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-2xl hover:bg-white/30 transition-all duration-300 flex items-center space-x-3 font-semibold border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl"
             >
-              {isLive ? <Pause size={16} /> : <Play size={16} />}
-              <span>{isLive ? 'Pause' : 'Resume'}</span>
+              {isLive ? <Pause size={18} /> : <Play size={18} />}
+              <span className="text-lg">{isLive ? 'Pause' : 'Resume'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-8 space-y-8">
         <div className="grid grid-cols-12 gap-8">
           
           {/* Main Content Area */}
           <div className="col-span-12 lg:col-span-8 space-y-8">
             
             {/* Stream Scorecard */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/30">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900 font-space-grotesk">Stream Scorecard</h2>
-                  <p className="text-gray-600 mt-2">Real-time performance metrics</p>
+            <div className="bg-white/60 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/40 hover:shadow-3xl transition-all duration-500">
+              <div className="flex items-center justify-between mb-10">
+                <div className="space-y-3">
+                  <h2 className="text-4xl font-bold text-gray-900 font-space-grotesk tracking-tight">Stream Scorecard</h2>
+                  <p className="text-lg text-gray-600 font-medium">Real-time performance metrics</p>
                 </div>
-                <button className="p-3 text-gray-400 hover:text-gray-600 transition-colors rounded-xl hover:bg-gray-100">
-                  <RefreshCw size={20} />
+                <button className="p-4 text-gray-400 hover:text-gray-600 transition-all duration-300 rounded-2xl hover:bg-white/60 backdrop-blur-sm border border-transparent hover:border-white/60 shadow-lg hover:shadow-xl">
+                  <RefreshCw size={24} />
                 </button>
               </div>
               
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                 <div className="text-center group">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <MessageSquare size={28} className="text-blue-600" />
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-100/80 to-indigo-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-500 shadow-xl border border-blue-200/50 group-hover:shadow-2xl">
+                    <MessageSquare size={32} className="text-blue-600" />
                   </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{streamMetrics.totalComments.toLocaleString()}</div>
-                  <div className="text-sm font-medium text-gray-600">Total Comments</div>
+                  <div className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">{streamMetrics.totalComments.toLocaleString()}</div>
+                  <div className="text-base font-semibold text-gray-600">Total Comments</div>
                 </div>
                 
                 <div className="text-center group">
-                  <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <Target size={28} className="text-green-600" />
+                  <div className="w-24 h-24 bg-gradient-to-br from-green-100/80 to-emerald-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-500 shadow-xl border border-green-200/50 group-hover:shadow-2xl">
+                    <Target size={32} className="text-green-600" />
                   </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{streamMetrics.intentPercentage}%</div>
-                  <div className="text-sm font-medium text-gray-600">Intent Rate</div>
+                  <div className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">{streamMetrics.intentPercentage}%</div>
+                  <div className="text-base font-semibold text-gray-600">Intent Rate</div>
                 </div>
                 
                 <div className="text-center group">
-                  <div className="w-20 h-20 bg-gradient-to-br from-red-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <AlertCircle size={28} className="text-red-600" />
+                  <div className="w-24 h-24 bg-gradient-to-br from-red-100/80 to-pink-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-500 shadow-xl border border-red-200/50 group-hover:shadow-2xl">
+                    <AlertCircle size={32} className="text-red-600" />
                   </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{streamMetrics.missedMoments}</div>
-                  <div className="text-sm font-medium text-gray-600">Missed Moments</div>
+                  <div className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">{streamMetrics.missedMoments}</div>
+                  <div className="text-base font-semibold text-gray-600">Missed Moments</div>
                 </div>
                 
                 <div className="text-center group">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-violet-100 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <Mic size={28} className="text-purple-600" />
+                  <div className="w-24 h-24 bg-gradient-to-br from-purple-100/80 to-violet-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-500 shadow-xl border border-purple-200/50 group-hover:shadow-2xl">
+                    <Mic size={32} className="text-purple-600" />
                   </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{streamMetrics.promptUsage}%</div>
-                  <div className="text-sm font-medium text-gray-600">Prompt Usage</div>
+                  <div className="text-5xl font-bold text-gray-900 mb-3 tracking-tight">{streamMetrics.promptUsage}%</div>
+                  <div className="text-base font-semibold text-gray-600">Prompt Usage</div>
                 </div>
               </div>
             </div>
 
             {/* Live Intent Pulse Graph */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/30">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 bg-[#FF3B5C]/10 rounded-2xl flex items-center justify-center">
-                    <Activity size={24} className="text-[#FF3B5C]" />
+            <div className="bg-white/60 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/40 hover:shadow-3xl transition-all duration-500">
+              <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center space-x-6">
+                  <div className="w-16 h-16 bg-[#FF3B5C]/20 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-[#FF3B5C]/30 shadow-lg">
+                    <Activity size={28} className="text-[#FF3B5C]" />
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 font-space-grotesk">Live Intent Pulse</h3>
-                    <p className="text-gray-600">Real-time buyer interest spikes</p>
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-bold text-gray-900 font-space-grotesk tracking-tight">Live Intent Pulse</h3>
+                    <p className="text-lg text-gray-600 font-medium">Real-time buyer interest spikes</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-4 h-4 bg-[#FF3B5C] rounded-full shadow-lg shadow-[#FF3B5C]/50"></div>
-                    <span className="text-sm font-medium text-gray-600">HOT Zone</span>
+                <div className="flex items-center space-x-8">
+                  <div className="flex items-center space-x-4 bg-gradient-to-r from-[#FF3B5C]/10 to-[#FF6B8A]/10 px-6 py-3 rounded-2xl border border-[#FF3B5C]/20 backdrop-blur-sm">
+                    <div className="w-4 h-4 bg-[#FF3B5C] rounded-full shadow-lg shadow-[#FF3B5C]/50 animate-pulse"></div>
+                    <span className="text-base font-bold text-[#FF3B5C]">HOT Zone</span>
                   </div>
-                  <div className="flex items-center space-x-3 bg-gray-100 px-4 py-2 rounded-xl">
-                    <Users size={16} className="text-gray-500" />
-                    <span className="text-sm font-bold text-gray-900">{streamMetrics.currentViewers}</span>
+                  <div className="flex items-center space-x-4 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/60 shadow-lg">
+                    <Users size={20} className="text-gray-500" />
+                    <span className="text-lg font-bold text-gray-900">{streamMetrics.currentViewers}</span>
                   </div>
                 </div>
               </div>
               
-              <div className="relative h-40 mb-6">
-                <div className="absolute inset-0 flex items-end justify-between space-x-2">
+              <div className="relative h-48 mb-8 bg-gradient-to-t from-gray-50/50 to-transparent rounded-2xl p-6 border border-gray-200/30">
+                <div className="absolute inset-6 flex items-end justify-between space-x-3">
                   {intentPulseData.map((point, index) => (
                     <div key={index} className="flex-1 flex flex-col items-center">
                       <div 
-                        className={`w-full rounded-t-xl transition-all duration-500 shadow-lg ${
+                        className={`w-full rounded-t-2xl transition-all duration-700 shadow-lg border-t-2 ${
                           point.isHot 
-                            ? 'bg-gradient-to-t from-[#FF3B5C] to-[#FF6B8A] shadow-[#FF3B5C]/30' 
-                            : 'bg-gradient-to-t from-blue-400 to-blue-500 shadow-blue-500/20'
+                            ? 'bg-gradient-to-t from-[#FF3B5C]/90 via-[#FF3B5C]/80 to-[#FF6B8A]/70 shadow-[#FF3B5C]/40 border-[#FF3B5C]/60' 
+                            : 'bg-gradient-to-t from-blue-400/80 via-blue-500/70 to-blue-600/60 shadow-blue-500/30 border-blue-400/50'
                         }`}
                         style={{ height: `${point.intensity}%` }}
                       >
                         {point.isHot && (
-                          <div className="w-full h-full flex items-start justify-center pt-2">
-                            <Flame size={14} className="text-white animate-pulse" />
+                          <div className="w-full h-full flex items-start justify-center pt-3">
+                            <Flame size={16} className="text-white animate-pulse drop-shadow-lg" />
                           </div>
                         )}
                       </div>
-                      <span className="text-xs font-medium text-gray-500 mt-3">{point.timestamp}</span>
+                      <span className="text-sm font-bold text-gray-500 mt-4 bg-white/60 px-2 py-1 rounded-lg backdrop-blur-sm">{point.timestamp}</span>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="flex items-center justify-between text-sm font-medium text-gray-600 bg-gray-50 px-4 py-2 rounded-xl">
+              <div className="flex items-center justify-between text-base font-bold text-gray-600 bg-gradient-to-r from-gray-50/60 to-gray-100/60 backdrop-blur-sm px-6 py-4 rounded-2xl border border-gray-200/40">
                 <span>Low Interest</span>
                 <span>High Interest</span>
               </div>
             </div>
 
             {/* Buyer Signal Cards */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/30">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center">
-                    <Zap size={24} className="text-green-600" />
+            <div className="bg-white/60 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/40 hover:shadow-3xl transition-all duration-500">
+              <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center space-x-6">
+                  <div className="w-16 h-16 bg-green-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-green-200/50 shadow-lg">
+                    <Zap size={28} className="text-green-600" />
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 font-space-grotesk">Buyer Signals</h3>
-                    <p className="text-gray-600">High-intent moments detected</p>
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-bold text-gray-900 font-space-grotesk tracking-tight">Buyer Signals</h3>
+                    <p className="text-lg text-gray-600 font-medium">High-intent moments detected</p>
                   </div>
                 </div>
-                <div className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <div className="text-base font-bold text-gray-500 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/60 shadow-lg">
                   Last updated: {new Date().toLocaleTimeString()}
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {buyerSignals.map((signal) => (
-                  <div key={signal.id} className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300 group">
+                  <div key={signal.id} className="bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/60 hover:shadow-2xl transition-all duration-500 group hover:bg-white/70">
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <span className="font-mono text-sm font-bold text-gray-700 bg-gray-100 px-3 py-2 rounded-xl">
+                      <div className="flex-1 space-y-6">
+                        <div className="flex items-center space-x-6">
+                          <span className="font-mono text-base font-bold text-gray-700 bg-white/80 backdrop-blur-sm px-5 py-3 rounded-2xl border border-gray-200/60 shadow-lg">
                             {signal.timestamp}
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getIntensityColor(signal.intensity)}`}>
+                          <span className={`px-4 py-2 rounded-2xl text-sm font-bold border backdrop-blur-sm ${getIntensityColor(signal.intensity)} shadow-lg`}>
                             {signal.intensity.toUpperCase()}
                           </span>
-                          <div className="flex items-center space-x-2 text-gray-500">
-                            <Eye size={14} />
-                            <span className="text-xs font-medium">{signal.viewerCount}</span>
+                          <div className="flex items-center space-x-3 text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-2xl border border-gray-200/40">
+                            <Eye size={16} />
+                            <span className="text-sm font-bold">{signal.viewerCount}</span>
                           </div>
                         </div>
-                        <p className="text-gray-800 font-semibold mb-3">{signal.summary}</p>
-                        <div className="flex flex-wrap gap-2">
+                        <p className="text-xl text-gray-800 font-bold leading-relaxed">{signal.summary}</p>
+                        <div className="flex flex-wrap gap-3">
                           {signal.keywords.map((keyword, index) => (
-                            <span key={index} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-xl text-xs font-semibold border border-blue-200">
+                            <span key={index} className="px-4 py-2 bg-blue-50/80 text-blue-700 rounded-2xl text-sm font-bold border border-blue-200/60 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
                               #{keyword}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <button className="p-2 text-gray-400 hover:text-[#FF3B5C] transition-colors rounded-xl hover:bg-gray-100 group-hover:scale-110">
-                        <ArrowUp size={16} />
+                      <button className="p-4 text-gray-400 hover:text-[#FF3B5C] transition-all duration-300 rounded-2xl hover:bg-white/60 backdrop-blur-sm border border-transparent hover:border-white/60 shadow-lg hover:shadow-xl group-hover:scale-110">
+                        <ArrowUp size={20} />
                       </button>
                     </div>
                   </div>
@@ -422,23 +423,23 @@ const LiveAnalyticsDashboard: React.FC = () => {
             </div>
 
             {/* Keyword Radar */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/30">
-              <div className="flex items-center space-x-4 mb-8">
-                <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
-                  <Hash size={24} className="text-purple-600" />
+            <div className="bg-white/60 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/40 hover:shadow-3xl transition-all duration-500">
+              <div className="flex items-center space-x-6 mb-10">
+                <div className="w-16 h-16 bg-purple-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-purple-200/50 shadow-lg">
+                  <Hash size={28} className="text-purple-600" />
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 font-space-grotesk">Keyword Radar</h3>
-                  <p className="text-gray-600">Trending product keywords</p>
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-bold text-gray-900 font-space-grotesk tracking-tight">Keyword Radar</h3>
+                  <p className="text-lg text-gray-600 font-medium">Trending product keywords</p>
                 </div>
               </div>
               
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-6">
                 {trendingKeywords.map((keyword, index) => (
-                  <div key={index} className="flex items-center space-x-3 bg-white/60 backdrop-blur-sm px-6 py-3 rounded-2xl border border-gray-100 hover:shadow-lg transition-all duration-300 group">
-                    <span className="font-bold text-gray-800">#{keyword.word}</span>
-                    <span className="text-sm font-medium text-gray-600">({keyword.count})</span>
-                    <div className="group-hover:scale-125 transition-transform duration-300">
+                  <div key={index} className="flex items-center space-x-4 bg-white/50 backdrop-blur-xl px-8 py-4 rounded-3xl border border-white/60 hover:shadow-2xl transition-all duration-500 group hover:bg-white/70">
+                    <span className="font-bold text-lg text-gray-800">#{keyword.word}</span>
+                    <span className="text-base font-bold text-gray-600 bg-gray-100/60 px-3 py-1 rounded-xl">({keyword.count})</span>
+                    <div className="group-hover:scale-125 transition-transform duration-500">
                       {getTrendIcon(keyword.trend)}
                     </div>
                   </div>
@@ -449,59 +450,59 @@ const LiveAnalyticsDashboard: React.FC = () => {
 
           {/* Sales Prompt Panel */}
           <div className="col-span-12 lg:col-span-4">
-            <div className="sticky top-8 bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/30">
-              <div className="flex items-center space-x-4 mb-8">
-                <div className="w-14 h-14 bg-[#FF3B5C]/10 rounded-2xl flex items-center justify-center">
-                  <Volume2 size={24} className="text-[#FF3B5C]" />
+            <div className="sticky top-8 bg-white/60 backdrop-blur-2xl rounded-3xl p-10 shadow-2xl border border-white/40 hover:shadow-3xl transition-all duration-500">
+              <div className="flex items-center space-x-6 mb-10">
+                <div className="w-16 h-16 bg-[#FF3B5C]/20 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-[#FF3B5C]/30 shadow-lg">
+                  <Volume2 size={28} className="text-[#FF3B5C]" />
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 font-space-grotesk">Sales Prompts</h3>
-                  <p className="text-gray-600">AI-suggested call-to-actions</p>
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-bold text-gray-900 font-space-grotesk tracking-tight">Sales Prompts</h3>
+                  <p className="text-lg text-gray-600 font-medium">AI-suggested call-to-actions</p>
                 </div>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {suggestedPrompts.map((prompt) => (
-                  <div key={prompt.id} className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
+                  <div key={prompt.id} className={`p-8 rounded-3xl border-2 transition-all duration-500 backdrop-blur-xl ${
                     prompt.urgency === 'high' 
-                      ? 'border-red-200 bg-gradient-to-br from-red-50 to-pink-50' 
-                      : 'border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50'
-                  } ${prompt.used ? 'opacity-60' : 'hover:shadow-lg'}`}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      ? 'border-red-200/60 bg-gradient-to-br from-red-50/60 via-red-50/40 to-pink-50/60 shadow-xl hover:shadow-2xl' 
+                      : 'border-yellow-200/60 bg-gradient-to-br from-yellow-50/60 via-yellow-50/40 to-amber-50/60 shadow-xl hover:shadow-2xl'
+                  } ${prompt.used ? 'opacity-60' : 'hover:scale-105'}`}>
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center space-x-4">
+                        <span className={`px-4 py-2 rounded-2xl text-sm font-bold backdrop-blur-sm border shadow-lg ${
                           prompt.urgency === 'high' 
-                            ? 'bg-red-100 text-red-800' 
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-red-100/80 text-red-800 border-red-200/60' 
+                            : 'bg-yellow-100/80 text-yellow-800 border-yellow-200/60'
                         }`}>
                           {prompt.urgency.toUpperCase()}
                         </span>
                         {prompt.used && (
-                          <CheckCircle size={16} className="text-green-600" />
+                          <CheckCircle size={20} className="text-green-600" />
                         )}
                       </div>
                       <button 
                         onClick={() => copyPrompt(prompt.prompt)}
-                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-xl hover:bg-white/50"
+                        className="p-3 text-gray-400 hover:text-gray-600 transition-all duration-300 rounded-2xl hover:bg-white/60 backdrop-blur-sm border border-transparent hover:border-white/60 shadow-lg hover:shadow-xl"
                         disabled={prompt.used}
                       >
-                        <Copy size={14} />
+                        <Copy size={16} />
                       </button>
                     </div>
                     
-                    <div className="text-xs font-bold text-gray-600 mb-3 uppercase tracking-wide">
+                    <div className="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider bg-white/60 backdrop-blur-sm px-3 py-2 rounded-xl inline-block">
                       {prompt.trigger}
                     </div>
                     
-                    <div className="text-sm text-gray-800 font-semibold leading-relaxed mb-4">
+                    <div className="text-base text-gray-800 font-bold leading-relaxed mb-6 bg-white/40 backdrop-blur-sm p-4 rounded-2xl border border-white/60">
                       {prompt.prompt}
                     </div>
                     
                     {!prompt.used && (
-                      <button className={`w-full px-4 py-3 rounded-xl font-bold transition-all duration-300 ${
+                      <button className={`w-full px-6 py-4 rounded-2xl font-bold transition-all duration-500 backdrop-blur-sm border shadow-xl hover:shadow-2xl hover:scale-105 ${
                         prompt.urgency === 'high'
-                          ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl'
-                          : 'bg-yellow-600 text-white hover:bg-yellow-700 shadow-lg hover:shadow-xl'
+                          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 border-red-500/50'
+                          : 'bg-gradient-to-r from-yellow-600 to-yellow-700 text-white hover:from-yellow-700 hover:to-yellow-800 border-yellow-500/50'
                       }`}>
                         Use This Prompt
                       </button>
@@ -510,12 +511,12 @@ const LiveAnalyticsDashboard: React.FC = () => {
                 ))}
               </div>
               
-              <div className="mt-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-                <div className="flex items-center space-x-3 mb-3">
-                  <TrendingUp size={16} className="text-blue-600" />
-                  <span className="text-sm font-bold text-blue-900">Performance Tip</span>
+              <div className="mt-10 p-8 bg-gradient-to-br from-blue-50/60 via-blue-50/40 to-indigo-50/60 backdrop-blur-xl rounded-3xl border border-blue-200/60 shadow-xl">
+                <div className="flex items-center space-x-4 mb-4">
+                  <TrendingUp size={20} className="text-blue-600" />
+                  <span className="text-base font-bold text-blue-900">Performance Tip</span>
                 </div>
-                <p className="text-sm text-blue-800 leading-relaxed">
+                <p className="text-base text-blue-800 leading-relaxed font-medium">
                   Your intent rate is {streamMetrics.intentPercentage}%. Try using more specific product prompts to boost engagement!
                 </p>
               </div>
