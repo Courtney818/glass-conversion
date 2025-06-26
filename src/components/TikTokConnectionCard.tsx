@@ -277,7 +277,7 @@ const TikTokConnectionCard: React.FC = () => {
               </div>
             </form>
           ) : (
-            /* View Mode */
+            /* View Mode - Show Edit Button */
             <div className="flex space-x-3">
               <button
                 onClick={startEditing}
