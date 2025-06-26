@@ -51,26 +51,40 @@ export const useTikTokConnection = () => {
       error: null,
     }));
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Format handle (ensure it starts with @)
-    const formattedHandle = handle.startsWith('@') ? handle : `@${handle}`;
+      // Format handle (ensure it starts with @)
+      const formattedHandle = handle.startsWith('@') ? handle : `@${handle}`;
 
-    // Update user with TikTok handle
-    const updatedUser = {
-      ...authState.user!,
-      tiktokHandle: formattedHandle,
-    };
+      // Basic validation
+      const cleanHandle = formattedHandle.slice(1);
+      if (cleanHandle.length < 2 || !/^[a-zA-Z0-9._]+$/.test(cleanHandle)) {
+        throw new Error('Invalid username format. Use letters, numbers, dots, and underscores only.');
+      }
 
-    login(updatedUser);
+      // Update user with TikTok handle
+      const updatedUser = {
+        ...authState.user!,
+        tiktokHandle: formattedHandle,
+      };
 
-    setConnectionState({
-      isConnected: true,
-      tiktokHandle: formattedHandle,
-      isLoading: false,
-      error: null,
-    });
+      login(updatedUser);
+
+      setConnectionState({
+        isConnected: true,
+        tiktokHandle: formattedHandle,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
+      setConnectionState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to connect handle',
+      }));
+    }
   };
 
   const connectRealTikTok = async () => {

@@ -1,51 +1,298 @@
-import React, { useState } from 'react';
-import { Video, ArrowRight, AlertCircle, CheckCircle, Loader2, Zap, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Video, ArrowRight, AlertCircle, CheckCircle, Loader2, Zap, X, Edit3, ExternalLink, Check } from 'lucide-react';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 
 const TikTokConnectionCard: React.FC = () => {
   const { connectionState, connectDevHandle, connectRealTikTok, disconnect, isDevMode } = useTikTokConnection();
   const [devHandle, setDevHandle] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Initialize dev handle from current connection
+  useEffect(() => {
+    if (connectionState.isConnected && connectionState.tiktokHandle) {
+      // Remove @ symbol for editing
+      const handle = connectionState.tiktokHandle.startsWith('@') 
+        ? connectionState.tiktokHandle.slice(1) 
+        : connectionState.tiktokHandle;
+      setDevHandle(handle);
+    }
+  }, [connectionState.isConnected, connectionState.tiktokHandle]);
+
+  const validateTikTokHandle = async (handle: string): Promise<boolean> => {
+    if (!handle.trim()) return false;
+    
+    try {
+      setIsValidating(true);
+      setValidationError(null);
+      
+      // Clean handle (remove @ if present)
+      const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
+      
+      // Ping TikTok profile URL to check if it exists
+      const response = await fetch(`https://www.tiktok.com/@${cleanHandle}`, {
+        method: 'HEAD',
+        mode: 'no-cors', // This will limit our ability to read the response, but prevents CORS issues
+      });
+      
+      // Since we're using no-cors, we can't actually read the response status
+      // In a real implementation, you'd need a backend proxy for this validation
+      // For now, we'll simulate validation with a timeout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate validation logic (in real implementation, use backend)
+      const isValid = cleanHandle.length >= 2 && /^[a-zA-Z0-9._]+$/.test(cleanHandle);
+      
+      if (!isValid) {
+        setValidationError('Invalid TikTok username format');
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.warn('TikTok validation failed (expected in dev):', error);
+      // In dev mode, we'll be more lenient with validation
+      const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
+      const isValid = cleanHandle.length >= 2 && /^[a-zA-Z0-9._]+$/.test(cleanHandle);
+      
+      if (!isValid) {
+        setValidationError('Invalid username format (use letters, numbers, dots, underscores only)');
+        return false;
+      }
+      
+      return true;
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const handleDevConnect = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate handle first
+    const isValid = await validateTikTokHandle(devHandle);
+    if (!isValid) return;
+    
     await connectDevHandle(devHandle);
-    setDevHandle('');
+    setIsEditing(false);
+  };
+
+  const handleDevUpdate = async () => {
+    // Validate handle first
+    const isValid = await validateTikTokHandle(devHandle);
+    if (!isValid) return;
+    
+    await connectDevHandle(devHandle);
+    setIsEditing(false);
   };
 
   const handleRealConnect = async () => {
     await connectRealTikTok();
   };
 
-  if (connectionState.isConnected) {
+  const handleDisconnect = () => {
+    disconnect();
+    setDevHandle('');
+    setIsEditing(false);
+    setValidationError(null);
+  };
+
+  const startEditing = () => {
+    setIsEditing(true);
+    setValidationError(null);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setValidationError(null);
+    // Reset to current handle
+    if (connectionState.tiktokHandle) {
+      const handle = connectionState.tiktokHandle.startsWith('@') 
+        ? connectionState.tiktokHandle.slice(1) 
+        : connectionState.tiktokHandle;
+      setDevHandle(handle);
+    }
+  };
+
+  // Dev Mode - Connected State with Edit Capability
+  if (connectionState.isConnected && isDevMode) {
     return (
       <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle size={24} className="text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">
-                TikTok Connected
-              </h3>
-              <p className="text-gray-600">
-                ✅ Connected to <span className="font-medium">{connectionState.tiktokHandle}</span>
-              </p>
+        {/* Dev Mode Banner */}
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <Zap size={16} className="text-yellow-600" />
+            <span className="text-sm font-medium text-yellow-800">
+              🧪 Dev Mode Active
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <CheckCircle size={24} className="text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">
+                  Connected to TikTok
+                </h3>
+                {!isEditing ? (
+                  <p className="text-gray-600">
+                    Current handle: <span className="font-medium">{connectionState.tiktokHandle}</span>
+                  </p>
+                ) : (
+                  <p className="text-gray-600">
+                    Editing TikTok handle
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-          
-          {isDevMode && (
-            <button
-              onClick={disconnect}
-              className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-              title="Disconnect (Dev Mode)"
-            >
-              <X size={20} />
-            </button>
+
+          {/* Edit Form */}
+          {isEditing ? (
+            <form onSubmit={(e) => { e.preventDefault(); handleDevUpdate(); }} className="space-y-4">
+              <div>
+                <label htmlFor="editHandle" className="block text-sm font-medium text-gray-700 mb-2">
+                  TikTok Username
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500 text-sm">@</span>
+                  </div>
+                  <input
+                    id="editHandle"
+                    type="text"
+                    value={devHandle}
+                    onChange={(e) => {
+                      setDevHandle(e.target.value);
+                      setValidationError(null);
+                    }}
+                    placeholder="username"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF3B5C] focus:border-transparent transition-colors"
+                    disabled={connectionState.isLoading || isValidating}
+                  />
+                  {isValidating && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      <Loader2 size={16} className="text-gray-400 animate-spin" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Validation Error */}
+                {validationError && (
+                  <div className="mt-2 flex items-center space-x-2 text-red-600">
+                    <AlertCircle size={14} />
+                    <span className="text-sm">{validationError}</span>
+                  </div>
+                )}
+                
+                {/* Validation Link */}
+                <div className="mt-2 flex items-center space-x-2">
+                  <ExternalLink size={14} className="text-gray-400" />
+                  <a 
+                    href={`https://www.tiktok.com/@${devHandle}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Check if @{devHandle} exists on TikTok
+                  </a>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  type="submit"
+                  disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
+                  className="flex-1 px-4 py-2 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {connectionState.isLoading || isValidating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>{isValidating ? 'Validating...' : 'Updating...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={16} />
+                      <span>Update</span>
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={cancelEditing}
+                  disabled={connectionState.isLoading || isValidating}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* View Mode */
+            <div className="flex space-x-3">
+              <button
+                onClick={startEditing}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center space-x-2"
+              >
+                <Edit3 size={16} />
+                <span>Edit Handle</span>
+              </button>
+              
+              <button
+                onClick={handleDisconnect}
+                className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors font-medium flex items-center justify-center space-x-2"
+              >
+                <X size={16} />
+                <span>Disconnect</span>
+              </button>
+            </div>
           )}
+
+          {/* Success Message */}
+          {!isEditing && (
+            <div className="p-3 bg-green-50 rounded-lg">
+              <p className="text-sm text-green-800">
+                🎉 Mock session active! Start your next TikTok Live stream and we'll analyze comments in real-time.
+              </p>
+            </div>
+          )}
+
+          {/* Dev Notice */}
+          <div className="p-3 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">
+              This is a mock session for development only. No real TikTok data is linked.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Production Mode - Connected State
+  if (connectionState.isConnected && !isDevMode) {
+    return (
+      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <CheckCircle size={24} className="text-green-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">
+              TikTok Connected
+            </h3>
+            <p className="text-gray-600">
+              ✅ Connected to <span className="font-medium">{connectionState.tiktokHandle}</span>
+            </p>
+          </div>
         </div>
         
-        <div className="mt-4 p-3 bg-green-50 rounded-lg">
+        <div className="p-3 bg-green-50 rounded-lg">
           <p className="text-sm text-green-800">
             🎉 You're ready to go live! Start your next TikTok Live stream and we'll analyze comments in real-time.
           </p>
@@ -54,6 +301,7 @@ const TikTokConnectionCard: React.FC = () => {
     );
   }
 
+  // Not Connected State
   return (
     <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
       {/* Dev Mode Banner */}
@@ -78,7 +326,7 @@ const TikTokConnectionCard: React.FC = () => {
           </h3>
           <p className="text-gray-600">
             {isDevMode 
-              ? 'Enter a test TikTok username to simulate connection'
+              ? 'Not connected. Enter test TikTok handle to continue.'
               : 'Link your TikTok account to start analyzing live streams'
             }
           </p>
@@ -86,11 +334,11 @@ const TikTokConnectionCard: React.FC = () => {
       </div>
 
       {/* Error Message */}
-      {connectionState.error && (
+      {(connectionState.error || validationError) && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-center space-x-2">
             <AlertCircle size={16} className="text-red-600" />
-            <span className="text-sm text-red-800">{connectionState.error}</span>
+            <span className="text-sm text-red-800">{connectionState.error || validationError}</span>
           </div>
         </div>
       )}
@@ -102,29 +350,62 @@ const TikTokConnectionCard: React.FC = () => {
             <label htmlFor="devHandle" className="block text-sm font-medium text-gray-700 mb-2">
               Enter test TikTok username
             </label>
-            <input
-              id="devHandle"
-              type="text"
-              value={devHandle}
-              onChange={(e) => setDevHandle(e.target.value)}
-              placeholder="e.g., glass_seller_live"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF3B5C] focus:border-transparent transition-colors"
-              disabled={connectionState.isLoading}
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Don't include the @ symbol - we'll add it automatically
-            </p>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 text-sm">@</span>
+              </div>
+              <input
+                id="devHandle"
+                type="text"
+                value={devHandle}
+                onChange={(e) => {
+                  setDevHandle(e.target.value);
+                  setValidationError(null);
+                }}
+                placeholder="glass_seller_live"
+                className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF3B5C] focus:border-transparent transition-colors"
+                disabled={connectionState.isLoading || isValidating}
+              />
+              {isValidating && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <Loader2 size={16} className="text-gray-400 animate-spin" />
+                </div>
+              )}
+            </div>
+            
+            {/* Validation Error */}
+            {validationError && (
+              <div className="mt-2 flex items-center space-x-2 text-red-600">
+                <AlertCircle size={14} />
+                <span className="text-sm">{validationError}</span>
+              </div>
+            )}
+            
+            {/* Validation Link */}
+            {devHandle && (
+              <div className="mt-2 flex items-center space-x-2">
+                <ExternalLink size={14} className="text-gray-400" />
+                <a 
+                  href={`https://www.tiktok.com/@${devHandle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  Check if @{devHandle} exists on TikTok
+                </a>
+              </div>
+            )}
           </div>
           
           <button
             type="submit"
-            disabled={connectionState.isLoading || !devHandle.trim()}
+            disabled={connectionState.isLoading || isValidating || !devHandle.trim()}
             className="w-full px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
-            {connectionState.isLoading ? (
+            {connectionState.isLoading || isValidating ? (
               <>
                 <Loader2 size={20} className="animate-spin" />
-                <span>Connecting...</span>
+                <span>{isValidating ? 'Validating...' : 'Connecting...'}</span>
               </>
             ) : (
               <>
@@ -158,12 +439,22 @@ const TikTokConnectionCard: React.FC = () => {
         </button>
       )}
 
+      {/* Privacy Notice */}
       <div className="mt-4 p-3 bg-blue-50 rounded-lg">
         <p className="text-sm text-blue-800">
           <strong>Privacy:</strong> We'll never message your followers or access private data. 
           TikTok connection keeps your account safe and compliant.
         </p>
       </div>
+
+      {/* Dev Notice */}
+      {isDevMode && (
+        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">
+            This is a mock session for development only. No real TikTok data is linked.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
