@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import { BarChart3, TrendingUp, Users, Clock, ArrowRight, Settings, User, Video, BookOpen, Play, ExternalLink, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useTikTokConnection } from '../hooks/useTikTokConnection';
+import TikTokConnectionCard from './TikTokConnectionCard';
 
 const Dashboard: React.FC = () => {
   const { authState, logout } = useAuth();
-  const [isConnected, setIsConnected] = useState(false);
+  const { connectionState } = useTikTokConnection();
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showSampleStream, setShowSampleStream] = useState(false);
 
   const handleBackToHome = () => {
     window.location.hash = '';
     window.location.reload();
-  };
-
-  const handleConnectTikTok = () => {
-    // Simulate TikTok connection
-    setIsConnected(true);
   };
 
   const handleViewSample = () => {
@@ -30,7 +27,6 @@ const Dashboard: React.FC = () => {
   // DEV ONLY – REMOVE BEFORE PRODUCTION
   const handleDevSkip = () => {
     // Skip to live dashboard state
-    setIsConnected(true);
     setShowSampleStream(true);
   };
 
@@ -197,14 +193,19 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
-                isConnected 
+                connectionState.isConnected 
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-gray-100 text-gray-600'
               }`}>
                 <div className={`w-2 h-2 rounded-full ${
-                  isConnected ? 'bg-green-500' : 'bg-gray-400'
+                  connectionState.isConnected ? 'bg-green-500' : 'bg-gray-400'
                 }`}></div>
-                <span>{isConnected ? 'Ready to Go Live' : 'Not Connected to TikTok'}</span>
+                <span>
+                  {connectionState.isConnected 
+                    ? `Ready to Go Live (${connectionState.tiktokHandle})` 
+                    : 'Not Connected to TikTok'
+                  }
+                </span>
               </div>
               <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
                 <Settings size={20} />
@@ -242,34 +243,19 @@ const Dashboard: React.FC = () => {
               </p>
             </div>
 
-            {!isConnected ? (
-              <div className="space-y-4">
-                <button
-                  onClick={handleConnectTikTok}
-                  className="inline-flex items-center space-x-3 px-8 py-4 bg-[#FF3B5C] text-white rounded-xl hover:bg-[#E63350] transition-colors font-semibold text-lg shadow-lg hover:shadow-xl group"
-                >
-                  <Video size={24} />
-                  <span>Connect Your TikTok</span>
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-                
-                <button
-                  onClick={() => setShowHowItWorks(!showHowItWorks)}
-                  className="block mx-auto text-gray-600 hover:text-gray-900 transition-colors underline underline-offset-4"
-                >
-                  How does this work?
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="inline-flex items-center space-x-3 px-6 py-3 bg-green-100 text-green-800 rounded-xl">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="font-medium">TikTok Connected! You're ready to go live.</span>
-                </div>
-                <p className="text-gray-600">
-                  Start your next TikTok Live stream and we'll analyze comments in real-time.
-                </p>
-              </div>
+            {/* TikTok Connection Card */}
+            <div className="max-w-2xl mx-auto">
+              <TikTokConnectionCard />
+            </div>
+
+            {/* How It Works Toggle */}
+            {!connectionState.isConnected && (
+              <button
+                onClick={() => setShowHowItWorks(!showHowItWorks)}
+                className="text-gray-600 hover:text-gray-900 transition-colors underline underline-offset-4"
+              >
+                How does this work?
+              </button>
             )}
           </div>
 
@@ -320,11 +306,11 @@ const Dashboard: React.FC = () => {
           )}
 
           {/* Secondary Actions */}
-          {!showHowItWorks && (
+          {!showHowItWorks && connectionState.isConnected && (
             <div className="space-y-6">
               <div className="flex items-center justify-center space-x-4">
                 <div className="h-px bg-gray-300 flex-1"></div>
-                <span className="text-gray-500 text-sm">Or explore while you wait</span>
+                <span className="text-gray-500 text-sm">Explore while you wait</span>
                 <div className="h-px bg-gray-300 flex-1"></div>
               </div>
 
@@ -361,7 +347,7 @@ const Dashboard: React.FC = () => {
                 onClick={handleDevSkip}
                 className="text-sm text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-4"
               >
-                Skip TikTok connection (developer access)
+                Skip to sample stream (developer access)
               </button>
               {/* // DEV ONLY – REMOVE BEFORE PRODUCTION */}
             </div>
