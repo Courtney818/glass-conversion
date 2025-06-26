@@ -30,38 +30,29 @@ const TikTokConnectionCard: React.FC = () => {
       // Clean handle (remove @ if present)
       const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
       
-      // Ping TikTok profile URL to check if it exists
-      const response = await fetch(`https://www.tiktok.com/@${cleanHandle}`, {
-        method: 'HEAD',
-        mode: 'no-cors', // This will limit our ability to read the response, but prevents CORS issues
-      });
-      
-      // Since we're using no-cors, we can't actually read the response status
-      // In a real implementation, you'd need a backend proxy for this validation
-      // For now, we'll simulate validation with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate validation logic (in real implementation, use backend)
-      const isValid = cleanHandle.length >= 2 && /^[a-zA-Z0-9._]+$/.test(cleanHandle);
-      
-      if (!isValid) {
-        setValidationError('Invalid TikTok username format');
+      // Basic format validation
+      if (cleanHandle.length < 2) {
+        setValidationError('Username must be at least 2 characters');
         return false;
       }
       
-      return true;
+      if (!/^[a-zA-Z0-9._]+$/.test(cleanHandle)) {
+        setValidationError('Username can only contain letters, numbers, dots, and underscores');
+        return false;
+      }
+      
+      // Simulate network validation delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // In a real implementation, you would ping the TikTok profile
+      // For dev mode, we'll simulate this check
+      const isValid = true; // Assume valid for dev mode
+      
+      return isValid;
     } catch (error) {
-      console.warn('TikTok validation failed (expected in dev):', error);
-      // In dev mode, we'll be more lenient with validation
-      const cleanHandle = handle.startsWith('@') ? handle.slice(1) : handle;
-      const isValid = cleanHandle.length >= 2 && /^[a-zA-Z0-9._]+$/.test(cleanHandle);
-      
-      if (!isValid) {
-        setValidationError('Invalid username format (use letters, numbers, dots, underscores only)');
-        return false;
-      }
-      
-      return true;
+      console.warn('TikTok validation failed:', error);
+      setValidationError('Validation failed. Please check the username manually.');
+      return false;
     } finally {
       setIsValidating(false);
     }
@@ -137,11 +128,11 @@ const TikTokConnectionCard: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">
-                  Connected to TikTok
+                  Connected to {connectionState.tiktokHandle}
                 </h3>
                 {!isEditing ? (
                   <p className="text-gray-600">
-                    Current handle: <span className="font-medium">{connectionState.tiktokHandle}</span>
+                    Mock TikTok session active
                   </p>
                 ) : (
                   <p className="text-gray-600">
@@ -191,17 +182,19 @@ const TikTokConnectionCard: React.FC = () => {
                 )}
                 
                 {/* Validation Link */}
-                <div className="mt-2 flex items-center space-x-2">
-                  <ExternalLink size={14} className="text-gray-400" />
-                  <a 
-                    href={`https://www.tiktok.com/@${devHandle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    Check if @{devHandle} exists on TikTok
-                  </a>
-                </div>
+                {devHandle && (
+                  <div className="mt-2 flex items-center space-x-2">
+                    <ExternalLink size={14} className="text-gray-400" />
+                    <a 
+                      href={`https://www.tiktok.com/@${devHandle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      Check if @{devHandle} exists on TikTok
+                    </a>
+                  </div>
+                )}
               </div>
               
               <div className="flex space-x-3">
@@ -258,7 +251,7 @@ const TikTokConnectionCard: React.FC = () => {
           {!isEditing && (
             <div className="p-3 bg-green-50 rounded-lg">
               <p className="text-sm text-green-800">
-                🎉 Mock session active! Start your next TikTok Live stream and we'll analyze comments in real-time.
+                ✅ Connected to {connectionState.tiktokHandle}
               </p>
             </div>
           )}
@@ -310,7 +303,7 @@ const TikTokConnectionCard: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Zap size={16} className="text-yellow-600" />
             <span className="text-sm font-medium text-yellow-800">
-              🧪 Dev Mode: Simulated TikTok Handle
+              🧪 Dev Mode Active
             </span>
           </div>
         </div>
