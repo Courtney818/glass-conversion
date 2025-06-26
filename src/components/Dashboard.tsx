@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import TikTokConnectionCard from './TikTokConnectionCard';
 import LiveAnalyticsDashboard from './LiveAnalyticsDashboard';
-import DashboardLayout from './DashboardLayout';
 
 const Dashboard: React.FC = () => {
   const { authState, logout } = useAuth();
@@ -12,7 +11,14 @@ const Dashboard: React.FC = () => {
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showSampleStream, setShowSampleStream] = useState(false);
   const [showLiveAnalytics, setShowLiveAnalytics] = useState(false);
-  const [showDashboardLayout, setShowDashboardLayout] = useState(false);
+
+  // If user is connected to TikTok, redirect to main dashboard
+  React.useEffect(() => {
+    if (connectionState.isConnected) {
+      // Redirect to the main dashboard layout
+      window.location.reload(); // This will trigger the DashboardLayout to render
+    }
+  }, [connectionState.isConnected]);
 
   const handleBackToHome = () => {
     window.location.hash = '';
@@ -27,10 +33,6 @@ const Dashboard: React.FC = () => {
     setShowLiveAnalytics(true);
   };
 
-  const handleViewDashboard = () => {
-    setShowDashboardLayout(true);
-  };
-
   const handleReadGuide = () => {
     window.location.hash = '#help';
     window.location.reload();
@@ -41,11 +43,6 @@ const Dashboard: React.FC = () => {
     // Skip to live dashboard state
     setShowSampleStream(true);
   };
-
-  // Show Dashboard Layout
-  if (showDashboardLayout) {
-    return <DashboardLayout />;
-  }
 
   // Show Live Analytics Dashboard
   if (showLiveAnalytics) {
@@ -212,6 +209,8 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  // If user is connected, this component shouldn't render (they should see DashboardLayout)
+  // This is the setup/connection screen for users without TikTok connection
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
@@ -348,8 +347,8 @@ const Dashboard: React.FC = () => {
             </div>
           )}
 
-          {/* Secondary Actions */}
-          {!showHowItWorks && connectionState.isConnected && (
+          {/* Secondary Actions - Only show if NOT connected */}
+          {!showHowItWorks && !connectionState.isConnected && (
             <div className="space-y-6">
               <div className="flex items-center justify-center space-x-4">
                 <div className="h-px bg-gray-300 flex-1"></div>
@@ -358,15 +357,6 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={handleViewDashboard}
-                  className="inline-flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors shadow-sm group font-semibold"
-                >
-                  <BarChart3 size={18} />
-                  <span>Full Dashboard</span>
-                  <ExternalLink size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </button>
-                
                 <button
                   onClick={handleViewSample}
                   className="inline-flex items-center space-x-2 px-6 py-3 bg-white/70 backdrop-blur-sm text-gray-700 rounded-lg hover:bg-white/90 transition-colors border border-white/20 shadow-sm group"
@@ -378,7 +368,7 @@ const Dashboard: React.FC = () => {
                 
                 <button
                   onClick={handleViewLiveAnalytics}
-                  className="inline-flex items-center space-x-2 px-6 py-3 bg-white/70 backdrop-blur-sm text-gray-700 rounded-lg hover:bg-white/90 transition-colors border border-white/20 shadow-sm group"
+                  className="inline-flex items-center space-x-2 px-6 py-3 bg-[#FF3B5C] text-white rounded-lg hover:bg-[#E63350] transition-colors shadow-sm group"
                 >
                   <Activity size={18} />
                   <span>Live Analytics Demo</span>

@@ -15,6 +15,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import LoginWithTikTok from './components/LoginWithTikTok';
 import Dashboard from './components/Dashboard';
+import DashboardLayout from './components/DashboardLayout';
 
 function App() {
   // Check current page
@@ -86,7 +87,7 @@ function App() {
 
         {isDashboardPage && (
           <ProtectedRoute>
-            <Dashboard />
+            <DashboardLayout />
           </ProtectedRoute>
         )}
 

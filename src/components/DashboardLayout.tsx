@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
 import DashboardSidebar from './DashboardSidebar';
 import LiveAnalyticsDashboard from './LiveAnalyticsDashboard';
+import { useAuth } from '../hooks/useAuth';
+import { useTikTokConnection } from '../hooks/useTikTokConnection';
+import Dashboard from './Dashboard';
 
 interface DashboardLayoutProps {
   children?: React.ReactNode;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const { authState } = useAuth();
+  const { connectionState } = useTikTokConnection();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // If user is not connected to TikTok, show the connection setup screen
+  if (!connectionState.isConnected) {
+    return <Dashboard />;
+  }
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);
@@ -103,7 +113,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">TikTok handle updated</p>
-                    <p className="text-sm text-gray-600">Connected @devmode • 1 day ago</p>
+                    <p className="text-sm text-gray-600">Connected {connectionState.tiktokHandle} • 1 day ago</p>
                   </div>
                 </div>
               </div>

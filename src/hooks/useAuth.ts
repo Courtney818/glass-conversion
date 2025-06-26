@@ -75,14 +75,6 @@ export const useAuthState = () => {
       };
       
       login(devUser);
-      
-      // Auto-redirect to dashboard if not already there
-      if (!window.location.hash.includes('dashboard')) {
-        setTimeout(() => {
-          window.location.hash = '#dashboard';
-          window.location.reload();
-        }, 100);
-      }
       return;
     }
 
