@@ -192,16 +192,6 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-6 border-b border-white/20">
-            {/* Dev Mode Badge */}
-            {authState.user?.isDev && (
-              <div className="mb-4">
-                <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-                  <span className="font-medium">Dev Mode</span>
-                </div>
-              </div>
-            )}
-
             {/* Logo */}
             <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
               <div className="w-10 h-10 bg-[#FF3B5C] rounded-xl flex items-center justify-center flex-shrink-0">
