@@ -126,7 +126,7 @@ const TikTokConnectionCard: React.FC = () => {
   // Connected State with Edit Capability
   if (connectionState.isConnected) {
     return (
-      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
         {/* Dev Mode Banner */}
         {isDevMode && (
           <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -301,7 +301,7 @@ const TikTokConnectionCard: React.FC = () => {
 
           {/* Success Message */}
           {!isEditing && (
-            <div className="p-3 bg-green-50 rounded-lg">
+            <div className="p-3 bg-green-50 rounded-lg border border-green-200">
               <p className="text-sm text-green-800">
                 ✅ Connected to {connectionState.tiktokHandle}
               </p>
@@ -310,7 +310,7 @@ const TikTokConnectionCard: React.FC = () => {
 
           {/* Dev Notice */}
           {isDevMode && (
-            <div className="p-3 bg-gray-50 rounded-lg">
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <p className="text-sm text-gray-600">
                 This is a mock session for development only. No real TikTok data is linked.
               </p>
@@ -323,7 +323,7 @@ const TikTokConnectionCard: React.FC = () => {
 
   // Not Connected State
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/20">
+    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
       {/* Dev Mode Banner */}
       {isDevMode && (
         <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -337,8 +337,8 @@ const TikTokConnectionCard: React.FC = () => {
       )}
 
       <div className="flex items-center space-x-4 mb-6">
-        <div className="w-12 h-12 bg-[#FF3B5C]/10 rounded-lg flex items-center justify-center">
-          <Video size={24} className="text-[#FF3B5C]" />
+        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+          <Video size={24} className="text-red-600" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-900 font-space-grotesk">
@@ -495,7 +495,7 @@ const TikTokConnectionCard: React.FC = () => {
       )}
 
       {/* Privacy Notice */}
-      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
         <p className="text-sm text-blue-800">
           <strong>Privacy:</strong> We'll never message your followers or access private data. 
           TikTok connection keeps your account safe and compliant.
@@ -504,7 +504,7 @@ const TikTokConnectionCard: React.FC = () => {
 
       {/* Dev Notice */}
       {isDevMode && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+        <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
           <p className="text-sm text-gray-600">
             This is a mock session for development only. No real TikTok data is linked.
           </p>
