@@ -14,10 +14,12 @@ import HelpPage from './components/HelpPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import LoginWithTikTok from './components/LoginWithTikTok';
-import Dashboard from './components/Dashboard';
 import DashboardLayout from './components/DashboardLayout';
+import { useAuth } from './hooks/useAuth';
 
-function App() {
+function AppContent() {
+  const { authState } = useAuth();
+  
   // Check current page
   const currentPath = window.location.pathname;
   const currentHash = window.location.hash;
@@ -59,54 +61,70 @@ function App() {
     };
   }, []);
 
+  // If user is authenticated and trying to access dashboard, show dashboard
+  if (authState.isAuthenticated && isDashboardPage) {
+    return <DashboardLayout />;
+  }
+
+  // If user is authenticated and on any other page, redirect to dashboard
+  if (authState.isAuthenticated && !isHelpPage && !isPrivacyPage && !isTermsPage) {
+    window.location.hash = '#dashboard';
+    window.location.reload();
+    return null;
+  }
+
+  // Show login page
+  if (isLoginPage) {
+    return <LoginWithTikTok />;
+  }
+
+  // Show public pages with navigation
+  return (
+    <div className="min-h-screen bg-white font-inter antialiased">
+      {isHelpPage && (
+        <>
+          <Navigation />
+          <HelpPage />
+        </>
+      )}
+
+      {isPrivacyPage && (
+        <>
+          <Navigation />
+          <PrivacyPolicy />
+        </>
+      )}
+
+      {isTermsPage && (
+        <>
+          <Navigation />
+          <TermsOfService />
+        </>
+      )}
+
+      {!isHelpPage && !isPrivacyPage && !isTermsPage && (
+        <>
+          <Navigation />
+          <main>
+            <Hero />
+            <Features />
+            <HowItWorks />
+            <WhyNoUsernames />
+            <AnalyticsPreview />
+            <Pricing />
+            <TrustIndicators />
+          </main>
+          <Footer />
+        </>
+      )}
+    </div>
+  );
+}
+
+function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-white font-inter antialiased">
-        {isHelpPage && (
-          <>
-            <Navigation />
-            <HelpPage />
-          </>
-        )}
-
-        {isPrivacyPage && (
-          <>
-            <Navigation />
-            <PrivacyPolicy />
-          </>
-        )}
-
-        {isTermsPage && (
-          <>
-            <Navigation />
-            <TermsOfService />
-          </>
-        )}
-
-        {isLoginPage && <LoginWithTikTok />}
-
-        {isDashboardPage && (
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        )}
-
-        {!isHelpPage && !isPrivacyPage && !isTermsPage && !isLoginPage && !isDashboardPage && (
-          <>
-            <Navigation />
-            <main>
-              <Hero />
-              <Features />
-              <HowItWorks />
-              <WhyNoUsernames />
-              <AnalyticsPreview />
-              <Pricing />
-              <TrustIndicators />
-            </main>
-            <Footer />
-          </>
-        )}
-      </div>
+      <AppContent />
     </AuthProvider>
   );
 }
