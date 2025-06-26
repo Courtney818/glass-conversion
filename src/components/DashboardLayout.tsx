@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DashboardSidebar from './DashboardSidebar';
 import LiveAnalyticsDashboard from './LiveAnalyticsDashboard';
+import SettingsPage from './SettingsPage';
 import { useAuth } from '../hooks/useAuth';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import Dashboard from './Dashboard';
@@ -306,35 +307,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         );
       
       case 'settings':
-        return (
-          <div className="p-6 space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-semibold text-gray-900 font-space-grotesk">
-                Settings
-              </h1>
-              <p className="text-gray-600">
-                TikTok connection and preferences
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl">⚙️</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 font-space-grotesk mb-3">
-                Settings Panel Coming Soon
-              </h3>
-              <p className="text-gray-600 max-w-md mx-auto mb-6">
-                Manage your TikTok connection, notification preferences, account settings, 
-                and customize your dashboard experience.
-              </p>
-              <div className="inline-flex items-center space-x-2 text-gray-600 font-medium bg-gray-50 px-3 py-2 rounded-lg">
-                <span>🔧</span>
-                <span>Configuration options in development</span>
-              </div>
-            </div>
-          </div>
-        );
+        return <SettingsPage />;
       
       case 'help':
         return (
