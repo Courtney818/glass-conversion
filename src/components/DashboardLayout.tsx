@@ -431,7 +431,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       />
       
       <main className={`flex-1 transition-all duration-500 overflow-auto ${
-        isSidebarCollapsed ? 'lg:ml-8' : 'lg:ml-20'
+        isSidebarCollapsed ? 'lg:ml-8' : 'lg:ml-8'
       }`}>
         <div className="min-h-full">
           {renderPageContent()}
